@@ -314,4 +314,15 @@ class DatabaseHelper {
       ('Extração Líquido-Líquido')
     ''');
   }
+  static Future<bool> validarLogin(String email, String senha) async {
+  final db = await getDatabase();
+
+  final resultado = await db.query(
+    'usuarios',
+    where: 'email = ? AND senha_hash = ? AND ativo = 1',
+    whereArgs: [email, senha],
+  );
+
+  return resultado.isNotEmpty;
+}
 }
