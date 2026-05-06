@@ -21,14 +21,12 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          
           Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // LOGO
                   Image.asset(
                     'assets/images/logo_labmaster.png',
                     width: isMobile ? size.width * 0.85 : 650,
