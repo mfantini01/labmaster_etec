@@ -325,4 +325,28 @@ class DatabaseHelper {
 
   return resultado.isNotEmpty;
 }
+static Future<bool> criarUsuario(
+  String nome,
+  String email,
+  String senha,
+) async {
+  final db = await getDatabase();
+
+  try {
+    await db.insert(
+      'usuarios',
+      {
+        'nome': nome,
+        'email': email,
+        'senha_hash': senha,
+        'tipo': 'aluno',
+        'ativo': 1,
+      },
+    );
+
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 }
