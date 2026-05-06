@@ -31,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login realizado com sucesso')),
       );
+
       debugPrint('Login OK');
     } else {
       ScaffoldMessenger.of(
@@ -42,6 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           Positioned.fill(
@@ -51,121 +53,169 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          Center(
-            child: Container(
-              width: 560,
-              height: 710,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.12),
-                    blurRadius: 30,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    height: 205,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFC90000),
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(18),
-                      ),
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'cps',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 42,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 18),
-                        Text(
-                          'Centro Paula Souza',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 560),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.12),
+                          blurRadius: 30,
+                          offset: const Offset(0, 12),
                         ),
                       ],
                     ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(40, 40, 40, 0),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
-                          'Email',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: InputDecoration(
-                            hintText: 'seu.email@etec.sp.gov.br',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 30),
-
-                        const Text(
-                          'Senha',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: senhaController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            hintText: 'Digite sua senha',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 30),
-
-                        SizedBox(
+                        Container(
+                          height: 190,
                           width: double.infinity,
-                          height: 60,
-                          child: ElevatedButton(
-                            onPressed: fazerLogin,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFC90000),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              elevation: 8,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFC90000),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(18),
                             ),
-                            child: const Text(
-                              'Entrar',
+                          ),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'cps',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 42,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 14),
+                              Text(
+                                'Centro Paula Souza',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(40, 38, 40, 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Email',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+
+                              TextField(
+                                controller: emailController,
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: InputDecoration(
+                                  hintText: 'seu.email@etec.sp.gov.br',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 26),
+
+                              const Text(
+                                'Senha',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+
+                              TextField(
+                                controller: senhaController,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  hintText: 'Digite sua senha',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 30),
+
+                              SizedBox(
+                                width: double.infinity,
+                                height: 60,
+                                child: ElevatedButton(
+                                  onPressed: fazerLogin,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFC90000),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 8,
+                                  ),
+                                  child: const Text(
+                                    'Entrar',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 14),
+
+                              Center(
+                                child: TextButton(
+                                  onPressed: () {
+                                    debugPrint('Ir para criar conta');
+                                  },
+                                  child: const Text(
+                                    'Criar conta',
+                                    style: TextStyle(
+                                      color: Color(0xFFC90000),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Container(
+                          height: 60,
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF3F3F3),
+                            borderRadius: BorderRadius.vertical(
+                              bottom: Radius.circular(18),
+                            ),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              '© 2026 Centro Paula Souza - ETEC',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                color: Colors.blueGrey,
+                                fontSize: 14,
                               ),
                             ),
                           ),
@@ -173,44 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 15),
-
-                  const SizedBox(height: 10),
-
-                  TextButton(
-                    onPressed: () {
-                      debugPrint("Ir para criar conta");
-                    },
-                    child: const Text(
-                      'Criar conta',
-                      style: TextStyle(
-                        color: Color(0xFFC90000),
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration
-                            .underline, // 👈 opcional (estilo link)
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-
-                  Container(
-                    height: 60,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFF3F3F3),
-                      borderRadius: BorderRadius.vertical(
-                        bottom: Radius.circular(18),
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        '© 2026 Centro Paula Souza - ETEC',
-                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
