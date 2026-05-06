@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
+import 'tela_cadastro.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -75,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          height: 190,
+                          height: 150.250,
                           width: double.infinity,
                           decoration: const BoxDecoration(
                             color: Color(0xFFC90000),
@@ -83,24 +84,23 @@ class _LoginScreenState extends State<LoginScreen> {
                               top: Radius.circular(18),
                             ),
                           ),
-                          child: const Column(
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                'cps',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 42,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Image.asset(
+                                'assets/images/logo2_cps.png',
+                                width: 145,
+                                fit: BoxFit.contain,
                               ),
-                              SizedBox(height: 14),
-                              Text(
-                                'Centro Paula Souza',
+
+                              const SizedBox(height: 8),
+
+                              const Text(
+                                'Acesse sua conta',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
@@ -184,7 +184,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               Center(
                                 child: TextButton(
                                   onPressed: () {
-                                    debugPrint('Ir para criar conta');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const CadastroScreen(),
+                                      ),
+                                    );
                                   },
                                   child: const Text(
                                     'Criar conta',
