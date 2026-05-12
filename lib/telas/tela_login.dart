@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 import 'tela_cadastro.dart';
+import 'tela_professor.dart';
+import 'tela_inicial.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,6 +15,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final senhaController = TextEditingController();
 
+  bool mostrarSenha = false;
+  
   @override
   void dispose() {
     emailController.dispose();
@@ -24,20 +28,23 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = emailController.text.trim();
     final senha = senhaController.text.trim();
 
-    final loginValido = await DatabaseHelper.validarLogin(email, senha);
+
+    final tipoUsuario = await DatabaseHelper.buscarTipoUsuario(email, senha);
 
     if (!mounted) return;
 
-    if (loginValido) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login realizado com sucesso')),
-      );
-
-      debugPrint('Login OK');
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Email ou senha inválidos')));
+    if (tipoUsuario != null) {
+      if (tipoUsuario == 'professor') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const ProfessorScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      }
     }
   }
 
@@ -145,11 +152,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
                               TextField(
                                 controller: senhaController,
-                                obscureText: true,
+                                obscureText: !mostrarSenha,
                                 decoration: InputDecoration(
                                   hintText: 'Digite sua senha',
+
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
+                                  ),
+
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      mostrarSenha
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        mostrarSenha = !mostrarSenha;
+                                      });
+                                    },
                                   ),
                                 ),
                               ),
