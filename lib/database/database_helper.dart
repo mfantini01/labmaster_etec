@@ -2,48 +2,36 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-
   static Database? _db;
 
   static Future<Database> getDatabase() async {
-
     if (_db != null) {
       return _db!;
     }
 
     final dbPath = await getDatabasesPath();
 
-    final path = join(
-      dbPath,
-      'labmaster.db'
-    );
+    final path = join(dbPath, 'labmaster.db');
 
     _db = await openDatabase(
       path,
       version: 1,
 
       onConfigure: (db) async {
-        await db.execute(
-          'PRAGMA foreign_keys = ON'
-        );
+        await db.execute('PRAGMA foreign_keys = ON');
       },
 
       onCreate: (db, version) async {
-
         await _createTables(db);
 
         await _insertInitialData(db);
-
       },
     );
 
     return _db!;
   }
 
-  static Future<void> _createTables(
-    Database db
-  ) async {
-
+  static Future<void> _createTables(Database db) async {
     await db.execute('''
       CREATE TABLE usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -259,19 +247,13 @@ class DatabaseHelper {
     ''');
   }
 
-  static Future<void> _insertInitialData(
-    Database db
-  ) async {
-
-    await db.insert(
-      'usuarios',
-      {
-        'nome': 'Professor Admin',
-        'email': 'professor@etec.sp.gov.br',
-        'senha_hash': '123456',
-        'tipo': 'professor'
-      }
-    );
+  static Future<void> _insertInitialData(Database db) async {
+    await db.insert('usuarios', {
+      'nome': 'Professor Admin',
+      'email': 'professor@etec.sp.gov.br',
+      'senha_hash': '123456',
+      'tipo': 'professor',
+    });
 
     await db.rawInsert('''
       INSERT INTO ajudas(
@@ -311,52 +293,66 @@ class DatabaseHelper {
       ('Extração Líquido-Líquido')
     ''');
   }
+
   static Future<bool> validarLogin(String email, String senha) async {
-  final db = await getDatabase();
+    final db = await getDatabase();
 
-  final resultado = await db.query(
-    'usuarios',
-    where: 'email = ? AND senha_hash = ? AND ativo = 1',
-    whereArgs: [email, senha],
-  );
-
-  return resultado.isNotEmpty;
-}
-static Future<bool> criarUsuario(
-  String nome,
-  String email,
-  String senha,
-) async {
-  final db = await getDatabase();
-
-  try {
-
-    String tipo;
-
-    if (email.endsWith('@aluno.cps')) {
-      tipo = 'aluno';
-    } else if (email.endsWith('@cps'))  {
-      tipo = 'professor';
-    } else {
-      return false;
-    }
-
-    await db.insert(
+    final resultado = await db.query(
       'usuarios',
-      {
+      where: 'email = ? AND senha_hash = ? AND ativo = 1',
+      whereArgs: [email, senha],
+    );
+
+    return resultado.isNotEmpty;
+  }
+
+  static Future<bool> criarUsuario(
+    String nome,
+    String email,
+    String senha,
+  ) async {
+    final db = await getDatabase();
+
+    try {
+      String tipo;
+
+      if (email.endsWith('@aluno.cps')) {
+        tipo = 'aluno';
+      } else if (email.endsWith('@cps')) {
+        tipo = 'professor';
+      } else {
+        return false;
+      }
+
+      await db.insert('usuarios', {
         'nome': nome,
         'email': email,
         'senha_hash': senha,
         'tipo': tipo,
         'ativo': 1,
-      },
+      });
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<String?> buscarTipoUsuario(String email, String senha) async {
+    final db = await getDatabase();
+
+    final resultado = await db.query(
+      'usuarios',
+      columns: ['tipo'],
+      where: 'email = ? AND senha_hash = ? AND ativo = 1',
+      whereArgs: [email, senha],
+      limit: 1,
     );
 
-    return true;
+    if (resultado.isEmpty) {
+      return null;
+    }
 
-  } catch (e) {
-
-    return false;
+    return resultado.first['tipo'] as String;
   }
-}
 }
