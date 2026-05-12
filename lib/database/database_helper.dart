@@ -34,9 +34,6 @@ class DatabaseHelper {
 
         await _insertInitialData(db);
 
-        print(
-          'Banco LabMaster criado com sucesso'
-        );
       },
     );
 
