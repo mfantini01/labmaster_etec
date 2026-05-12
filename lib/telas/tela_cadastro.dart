@@ -154,7 +154,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                                 controller: emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
-                                  hintText: 'seu.email@etec.sp.gov.br',
+                                  hintText: 'seu.email@aluno.cps',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),

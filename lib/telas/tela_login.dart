@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 controller: emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
-                                  hintText: 'seu.email@etec.sp.gov.br',
+                                  hintText: 'seu.email@aluno.cps',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
