@@ -13,7 +13,6 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // FUNDO
           Positioned.fill(
             child: Image.asset(
               'assets/images/fundo_login.png',
@@ -35,7 +34,7 @@ class HomeScreen extends StatelessWidget {
 
                   SizedBox(height: isMobile ? 40 : 55),
 
-                  // botao jogar
+                 
                   SizedBox(
                     width: isMobile ? size.width * 0.72 : 320,
                     height: isMobile ? 70 : 90,
@@ -71,7 +70,6 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          // BOTÃO SAIR
           Positioned(
             bottom: 30,
             right: 30,

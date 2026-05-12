@@ -15,69 +15,53 @@ class _CadastroScreenState extends State<CadastroScreen> {
   final emailController = TextEditingController();
   final senhaController = TextEditingController();
 
+  bool mostrarSenha = false;
+
   @override
   void dispose() {
     nomeController.dispose();
     emailController.dispose();
     senhaController.dispose();
     super.dispose();
-  } 
+  }
 
   Future<void> criarConta() async {
-  final nome = nomeController.text.trim();
-  final email = emailController.text.trim();
-  final senha = senhaController.text.trim();
+    final nome = nomeController.text.trim();
+    final email = emailController.text.trim();
+    final senha = senhaController.text.trim();
 
-  if (nome.isEmpty || email.isEmpty || senha.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Preencha todos os campos'),
-      ),
-    );
-    return;
+    if (nome.isEmpty || email.isEmpty || senha.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Preencha todos os campos')));
+      return;
+    }
+
+    final emailValido = email.endsWith('@cps') || email.endsWith('@aluno.cps');
+
+    if (!emailValido) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Use um email @aluno.cps ou @cps')),
+      );
+      return;
+    }
+
+    final sucesso = await DatabaseHelper.criarUsuario(nome, email, senha);
+
+    if (!mounted) return;
+
+    if (sucesso) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Conta criada com sucesso')));
+
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Este email já está cadastrado')),
+      );
+    }
   }
-
-  final emailValido =
-      email.endsWith('@cps') ||
-      email.endsWith('@aluno.cps');
-
-  if (!emailValido) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Use um email @aluno.cps ou @cps',
-        ),
-      ),
-    );
-    return;
-  }
-
-  final sucesso = await DatabaseHelper.criarUsuario(
-    nome,
-    email,
-    senha,
-  );
-
-  if (!mounted) return;
-
-  if (sucesso) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Conta criada com sucesso'),
-      ),
-    );
-
-    Navigator.pop(context);
-
-  } else {
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Este email já está cadastrado'),
-      ),
-    );
-  }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -200,11 +184,25 @@ class _CadastroScreenState extends State<CadastroScreen> {
                               const SizedBox(height: 10),
                               TextField(
                                 controller: senhaController,
-                                obscureText: true,
+                                obscureText: !mostrarSenha,
                                 decoration: InputDecoration(
                                   hintText: 'Digite sua senha',
+
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
+                                  ),
+
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      mostrarSenha
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        mostrarSenha = !mostrarSenha;
+                                      });
+                                    },
                                   ),
                                 ),
                               ),
