@@ -34,9 +34,6 @@ class DatabaseHelper {
 
         await _insertInitialData(db);
 
-        print(
-          'Banco LabMaster criado com sucesso'
-        );
       },
     );
 
@@ -333,19 +330,32 @@ static Future<bool> criarUsuario(
   final db = await getDatabase();
 
   try {
+
+    String tipo;
+
+    if (email.endsWith('@aluno.cps')) {
+      tipo = 'aluno';
+    } else if (email.endsWith('@cps'))  {
+      tipo = 'professor';
+    } else {
+      return false;
+    }
+
     await db.insert(
       'usuarios',
       {
         'nome': nome,
         'email': email,
         'senha_hash': senha,
-        'tipo': 'aluno',
+        'tipo': tipo,
         'ativo': 1,
       },
     );
 
     return true;
+
   } catch (e) {
+
     return false;
   }
 }

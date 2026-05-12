@@ -21,36 +21,63 @@ class _CadastroScreenState extends State<CadastroScreen> {
     emailController.dispose();
     senhaController.dispose();
     super.dispose();
-  }
+  } 
 
   Future<void> criarConta() async {
-    final nome = nomeController.text.trim();
-    final email = emailController.text.trim();
-    final senha = senhaController.text.trim();
+  final nome = nomeController.text.trim();
+  final email = emailController.text.trim();
+  final senha = senhaController.text.trim();
 
-    if (nome.isEmpty || email.isEmpty || senha.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Preencha todos os campos')));
-      return;
-    }
-
-    final sucesso = await DatabaseHelper.criarUsuario(nome, email, senha);
-
-    if (!mounted) return;
-
-    if (sucesso) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Conta criada com sucesso')));
-
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Este email já está cadastrado')),
-      );
-    }
+  if (nome.isEmpty || email.isEmpty || senha.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Preencha todos os campos'),
+      ),
+    );
+    return;
   }
+
+  final emailValido =
+      email.endsWith('@cps') ||
+      email.endsWith('@aluno.cps');
+
+  if (!emailValido) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Use um email @aluno.cps ou @cps',
+        ),
+      ),
+    );
+    return;
+  }
+
+  final sucesso = await DatabaseHelper.criarUsuario(
+    nome,
+    email,
+    senha,
+  );
+
+  if (!mounted) return;
+
+  if (sucesso) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Conta criada com sucesso'),
+      ),
+    );
+
+    Navigator.pop(context);
+
+  } else {
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Este email já está cadastrado'),
+      ),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +181,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                                 controller: emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
-                                  hintText: 'seu.email@etec.sp.gov.br',
+                                  hintText: 'seu.email@cps',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
