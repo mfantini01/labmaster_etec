@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'tela_perguntas.dart';
 
-class ProfessorScreen extends StatelessWidget {
-  const ProfessorScreen({super.key});
+class TelaPerguntas extends StatelessWidget {
+  const TelaPerguntas({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +18,15 @@ class ProfessorScreen extends StatelessWidget {
             ),
           ),
 
+          Positioned(
+            top: isMobile ? 20 : 30,
+            left: isMobile ? 20 : 30,
+            child: Image.asset(
+              'assets/images/logo2_cps.png',
+              width: isMobile ? 90 : 120,
+            ),
+          ),
+
           Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -28,37 +35,31 @@ class ProfessorScreen extends StatelessWidget {
                 children: [
                   Image.asset(
                     'assets/images/logo_labmaster.png',
-                    width: isMobile ? size.width * 0.9 : 700,
+                    width: isMobile ? size.width * 0.85 : 650,
                     fit: BoxFit.contain,
                   ),
 
                   SizedBox(height: isMobile ? 35 : 55),
 
                   Wrap(
-                    spacing: isMobile ? 0 : 55,
-                    runSpacing: 20,
                     alignment: WrapAlignment.center,
+                    spacing: 28,
+                    runSpacing: 22,
                     children: [
-                      _MenuButton(
-                        text: 'Perguntas',
+                      _BotaoPergunta(
+                        texto: 'Adicionar\nPerguntas',
                         width: isMobile ? size.width * 0.75 : 260,
-                        height: isMobile ? 65 : 80,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const TelaPerguntas(),
-                            ),
-                          );
-                        },
+                        onPressed: () {},
                       ),
-                      _MenuButton(
-                        text: 'Ranking',
+                      _BotaoPergunta(
+                        texto: 'Editar\nPerguntas',
                         width: isMobile ? size.width * 0.75 : 260,
-                        height: isMobile ? 65 : 80,
-                        onPressed: () {
-                          debugPrint('Ranking clicado');
-                        },
+                        onPressed: () {},
+                      ),
+                      _BotaoPergunta(
+                        texto: 'Excluir\nPerguntas',
+                        width: isMobile ? size.width * 0.75 : 260,
+                        onPressed: () {},
                       ),
                     ],
                   ),
@@ -68,14 +69,14 @@ class ProfessorScreen extends StatelessWidget {
           ),
 
           Positioned(
-            bottom: 30,
-            right: 30,
+            bottom: isMobile ? 20 : 30,
+            right: isMobile ? 20 : 30,
             child: SizedBox(
-              width: isMobile ? 90 : 100,
-              height: isMobile ? 45 : 50,
+              width: isMobile ? 95 : 110,
+              height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  exit(0);
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[700],
@@ -84,7 +85,13 @@ class ProfessorScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text('Sair'),
+                child: const Text(
+                  'Voltar',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
               ),
             ),
           ),
@@ -94,16 +101,14 @@ class ProfessorScreen extends StatelessWidget {
   }
 }
 
-class _MenuButton extends StatelessWidget {
-  final String text;
+class _BotaoPergunta extends StatelessWidget {
+  final String texto;
   final double width;
-  final double height;
   final VoidCallback onPressed;
 
-  const _MenuButton({
-    required this.text,
+  const _BotaoPergunta({
+    required this.texto,
     required this.width,
-    required this.height,
     required this.onPressed,
   });
 
@@ -111,21 +116,26 @@ class _MenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: width,
-      height: height,
+      height: 85,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFD32F2F),
           foregroundColor: Colors.white,
-          elevation: 10,
+          elevation: 8,
           shadowColor: Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
         ),
         child: Text(
-          text,
-          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          texto,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 26,
+            height: 1.1,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
