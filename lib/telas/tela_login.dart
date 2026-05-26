@@ -25,28 +25,41 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> fazerLogin() async {
-    final email = emailController.text.trim();
-    final senha = senhaController.text.trim();
+  final email = emailController.text.trim();
+  final senha = senhaController.text.trim();
 
-
-    final tipoUsuario = await DatabaseHelper.buscarTipoUsuario(email, senha);
-
-    if (!mounted) return;
-
-    if (tipoUsuario != null) {
-      if (tipoUsuario == 'professor') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const ProfessorScreen()),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      }
-    }
+  if (email.isEmpty || senha.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Preencha email e senha')),
+    );
+    return;
   }
+
+  final tipoUsuario = await DatabaseHelper.buscarTipoUsuario(email, senha);
+
+  if (!mounted) return;
+
+  if (tipoUsuario != null) {
+    if (tipoUsuario == 'professor') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfessorScreen()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Usuário não encontrado ou senha incorreta'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 controller: emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
-                                  hintText: 'seu.email@aluno.cps',
+                                  hintText: 'seu.email@aluno.cps.sp.gov.br',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
