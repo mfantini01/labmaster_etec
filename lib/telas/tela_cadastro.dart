@@ -37,11 +37,11 @@ class _CadastroScreenState extends State<CadastroScreen> {
       return;
     }
 
-    final emailValido = email.endsWith('@cps') || email.endsWith('@aluno.cps');
+    final emailValido = email.endsWith('@cps.sp.gov.br') || email.endsWith('@aluno.cps.sp.gov.br');
 
     if (!emailValido) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Use um email @aluno.cps ou @cps')),
+        const SnackBar(content: Text('Use um email @aluno.cps.sp.gov.br ou @cps.sp.gov.br')),
       );
       return;
     }
@@ -165,7 +165,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                                 controller: emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
-                                  hintText: 'seu.email@cps',
+                                  hintText: 'seu.email@cps.sp.gov.br',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),

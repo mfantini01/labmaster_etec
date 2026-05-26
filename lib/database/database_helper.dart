@@ -250,7 +250,7 @@ class DatabaseHelper {
   static Future<void> _insertInitialData(Database db) async {
     await db.insert('usuarios', {
       'nome': 'Professor Admin',
-      'email': 'professor@etec.sp.gov.br',
+      'email': 'professor@cps.sp.gov.br',
       'senha_hash': '123456',
       'tipo': 'professor',
     });
@@ -316,9 +316,9 @@ class DatabaseHelper {
     try {
       String tipo;
 
-      if (email.endsWith('@aluno.cps')) {
+      if (email.endsWith('@aluno.cps.sp.gov.br')) {
         tipo = 'aluno';
-      } else if (email.endsWith('@cps')) {
+      } else if (email.endsWith('@cps.sp.gov.br')) {
         tipo = 'professor';
       } else {
         return false;
