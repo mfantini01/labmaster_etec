@@ -3,6 +3,7 @@ import '../database/database_helper.dart';
 import 'tela_cadastro.dart';
 import 'tela_professor.dart';
 import 'tela_inicial.dart';
+import 'tela_aluno.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -48,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const TelaAluno()),
       );
     }
   } else {
