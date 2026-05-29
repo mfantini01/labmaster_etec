@@ -20,6 +20,15 @@ class ProfessorScreen extends StatelessWidget {
             ),
           ),
 
+          Positioned(
+            top: isMobile ? 20 : 30,
+            left: isMobile ? 20 : 30,
+            child: Image.asset(
+              'assets/images/logo_cps_semfundo.png',
+              width: isMobile ? 90 : 120,
+            ),
+          ),
+
           Center(
             child: Padding(
               padding: const EdgeInsets.all(24),

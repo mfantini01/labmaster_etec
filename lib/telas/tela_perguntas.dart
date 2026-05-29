@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'tela_adicionar_perguntas.dart';
 
 class TelaPerguntas extends StatelessWidget {
   const TelaPerguntas({super.key});
@@ -22,7 +23,7 @@ class TelaPerguntas extends StatelessWidget {
             top: isMobile ? 20 : 30,
             left: isMobile ? 20 : 30,
             child: Image.asset(
-              'assets/images/logo2_cps.png',
+              'assets/images/logo_cps_semfundo.png',
               width: isMobile ? 90 : 120,
             ),
           ),
@@ -49,7 +50,14 @@ class TelaPerguntas extends StatelessWidget {
                       _BotaoPergunta(
                         texto: 'Adicionar\nPerguntas',
                         width: isMobile ? size.width * 0.75 : 260,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TelaAdicionarPerguntas(),
+                            ),
+                          );
+                        },
                       ),
                       _BotaoPergunta(
                         texto: 'Editar\nPerguntas',
