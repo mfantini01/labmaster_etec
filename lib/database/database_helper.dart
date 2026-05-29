@@ -304,4 +304,38 @@ class DatabaseHelper {
       return false;
     }
   }
+  static Future<bool> atualizarUsuario({
+  required String emailAtual,
+  required String novoEmail,
+  required String novaSenha,
+}) async {
+  final db = await getDatabase();
+
+  try {
+    String tipo;
+
+    if (novoEmail.endsWith('@aluno.cps.sp.gov.br')) {
+      tipo = 'aluno';
+    } else if (novoEmail.endsWith('@cps.sp.gov.br')) {
+      tipo = 'professor';
+    } else {
+      return false;
+    }
+
+    final linhasAfetadas = await db.update(
+      'usuarios',
+      {
+        'email': novoEmail,
+        'senha_hash': novaSenha,
+        'tipo': tipo,
+      },
+      where: 'email = ?',
+      whereArgs: [emailAtual],
+    );
+
+    return linhasAfetadas > 0;
+  } catch (e) {
+    return false;
+  }
+}
 }
