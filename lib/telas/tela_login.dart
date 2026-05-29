@@ -25,9 +25,9 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> fazerLogin() async {
-  final email = emailController.text;
-  final senha = senhaController.text;
+Future<void> fazerLogin() async {
+  final email = emailController.text.trim();
+  final senha = senhaController.text.trim();
 
   if (email.isEmpty || senha.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -49,7 +49,12 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const TelaAluno()),
+        MaterialPageRoute(
+          builder: (context) => TelaAluno(
+            email: email,
+            senha: senha,
+          ),
+        ),
       );
     }
   } else {

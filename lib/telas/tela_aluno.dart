@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'tela_editar_perfil.dart';
 
 class TelaAluno extends StatelessWidget {
-  const TelaAluno({super.key});
+  final String email;
+  final String senha;
+
+  const TelaAluno({
+    super.key,
+    required this.email,
+    required this.senha,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +43,7 @@ class TelaAluno extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset(
-                    'assets/images/logo_aluno_sem_fundo.png',
+                    'assets/images/logo_labmaster.png',
                     width: isMobile ? size.width * 0.9 : 720,
                     fit: BoxFit.contain,
                   ),
@@ -54,11 +62,20 @@ class TelaAluno extends StatelessWidget {
                           debugPrint('Jogar clicado');
                         },
                       ),
+
                       _BotaoAluno(
                         texto: 'Editar Perfil',
                         width: isMobile ? size.width * 0.72 : 270,
                         onPressed: () {
-                          debugPrint('Editar Perfil clicado');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TelaEditarPerfil(
+                                emailAtual: email,
+                                senhaAtual: senha,
+                              ),
+                            ),
+                          );
                         },
                       ),
                     ],
