@@ -304,38 +304,172 @@ class DatabaseHelper {
       return false;
     }
   }
+
   static Future<bool> atualizarUsuario({
-  required String emailAtual,
-  required String novoEmail,
-  required String novaSenha,
-}) async {
-  final db = await getDatabase();
+    required String emailAtual,
+    required String novoEmail,
+    required String novaSenha,
+  }) async {
+    final db = await getDatabase();
 
-  try {
-    String tipo;
+    try {
+      String tipo;
 
-    if (novoEmail.endsWith('@aluno.cps.sp.gov.br')) {
-      tipo = 'aluno';
-    } else if (novoEmail.endsWith('@cps.sp.gov.br')) {
-      tipo = 'professor';
-    } else {
+      if (novoEmail.endsWith('@aluno.cps.sp.gov.br')) {
+        tipo = 'aluno';
+      } else if (novoEmail.endsWith('@cps.sp.gov.br')) {
+        tipo = 'professor';
+      } else {
+        return false;
+      }
+
+      final linhasAfetadas = await db.update(
+        'usuarios',
+        {'email': novoEmail, 'senha_hash': novaSenha, 'tipo': tipo},
+        where: 'email = ?',
+        whereArgs: [emailAtual],
+      );
+
+      return linhasAfetadas > 0;
+    } catch (e) {
       return false;
     }
+  }
 
-    final linhasAfetadas = await db.update(
-      'usuarios',
-      {
-        'email': novoEmail,
-        'senha_hash': novaSenha,
-        'tipo': tipo,
-      },
-      where: 'email = ?',
-      whereArgs: [emailAtual],
+  static Future<List<Map<String, dynamic>>> pesquisarPerguntas(
+    String termo,
+  ) async {
+    final db = await getDatabase();
+
+    final todas = await db.query(
+      'questoes',
+      where: 'ativa = 1',
+      orderBy: 'id DESC',
     );
 
-    return linhasAfetadas > 0;
-  } catch (e) {
-    return false;
+    if (termo.trim().isEmpty) {
+      return todas;
+    }
+
+    String normalizar(String texto) {
+      return texto
+          .toLowerCase()
+          .replaceAll('á', 'a')
+          .replaceAll('à', 'a')
+          .replaceAll('ã', 'a')
+          .replaceAll('â', 'a')
+          .replaceAll('é', 'e')
+          .replaceAll('ê', 'e')
+          .replaceAll('í', 'i')
+          .replaceAll('ó', 'o')
+          .replaceAll('ô', 'o')
+          .replaceAll('õ', 'o')
+          .replaceAll('ú', 'u')
+          .replaceAll('ç', 'c');
+    }
+
+    final termoNormalizado = normalizar(termo);
+
+    return todas.where((pergunta) {
+      final enunciado = normalizar(pergunta['enunciado']?.toString() ?? '');
+      return enunciado.contains(termoNormalizado);
+    }).toList();
   }
-}
+
+  static Future<Map<String, dynamic>?> buscarPerguntaCompleta(
+    int questaoId,
+  ) async {
+    final db = await getDatabase();
+
+    final questoes = await db.rawQuery(
+      '''
+      SELECT q.*, i.caminho AS caminho_imagem
+      FROM questoes q
+      LEFT JOIN imagens i ON i.id = q.imagem_id
+      WHERE q.id = ?
+      LIMIT 1
+      ''',
+      [questaoId],
+    );
+
+    if (questoes.isEmpty) return null;
+
+    final alternativas = await db.query(
+      'alternativas',
+      where: 'questao_id = ?',
+      whereArgs: [questaoId],
+      orderBy: 'id ASC',
+    );
+
+    return {'questao': questoes.first, 'alternativas': alternativas};
+  }
+
+  static Future<bool> atualizarPerguntas({
+    required int questaoId,
+    required String enunciado,
+    required String dica,
+    required int dificuldade,
+    required String alternativaA,
+    required String alternativaB,
+    required String alternativaC,
+    required String alternativaD,
+    required String alternativaCorreta,
+    String? caminhoImagem,
+  }) async {
+    final db = await getDatabase();
+
+    try {
+      int? imagemId;
+
+      if (caminhoImagem != null && caminhoImagem.isNotEmpty) {
+        imagemId = await db.insert('imagens', {
+          'caminho': caminhoImagem,
+          'descricao_alt': enunciado,
+        });
+      }
+
+      final dadosQuestao = {
+        'enunciado': enunciado,
+        'dificuldade': dificuldade,
+        'dica': dica,
+        'ativa': 1,
+      };
+
+      if (imagemId != null) {
+        dadosQuestao['imagem_id'] = imagemId;
+      }
+
+      await db.update(
+        'questoes',
+        dadosQuestao,
+        where: 'id = ?',
+        whereArgs: [questaoId],
+      );
+
+      await db.delete(
+        'alternativas',
+        where: 'questao_id = ?',
+        whereArgs: [questaoId],
+      );
+
+      final alternativas = {
+        'A': alternativaA,
+        'B': alternativaB,
+        'C': alternativaC,
+        'D': alternativaD,
+      };
+
+      for (final item in alternativas.entries) {
+        await db.insert('alternativas', {
+          'questao_id': questaoId,
+          'texto': item.value,
+          'correta': item.key == alternativaCorreta ? 1 : 0,
+        });
+      }
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

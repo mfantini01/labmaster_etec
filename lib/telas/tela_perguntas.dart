@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'tela_adicionar_perguntas.dart';
+import 'tela_editar_perguntas.dart';
 
 class TelaPerguntas extends StatelessWidget {
   const TelaPerguntas({super.key});
@@ -54,7 +55,8 @@ class TelaPerguntas extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const TelaAdicionarPerguntas(),
+                              builder: (context) =>
+                                  const TelaAdicionarPerguntas(),
                             ),
                           );
                         },
@@ -62,7 +64,14 @@ class TelaPerguntas extends StatelessWidget {
                       _BotaoPergunta(
                         texto: 'Editar\nPerguntas',
                         width: isMobile ? size.width * 0.75 : 260,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TelaEditarPerguntas(),
+                            ),
+                          );
+                        },
                       ),
                       _BotaoPergunta(
                         texto: 'Excluir\nPerguntas',
@@ -95,10 +104,7 @@ class TelaPerguntas extends StatelessWidget {
                 ),
                 child: const Text(
                   'Voltar',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
             ),
