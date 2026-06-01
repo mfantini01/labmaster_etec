@@ -298,24 +298,22 @@ class _TelaFormularioEditarPerguntasState
     dificuldade = questao['dificuldade']?.toString();
     caminhoImagem = questao['caminho_imagem']?.toString();
 
-    if (alternativas.isNotEmpty) {
-      alternativaAController.text = alternativas.length > 0
-          ? alternativas[0]['texto']?.toString() ?? ''
-          : '';
-      alternativaBController.text = alternativas.length > 1
-          ? alternativas[1]['texto']?.toString() ?? ''
-          : '';
-      alternativaCController.text = alternativas.length > 2
-          ? alternativas[2]['texto']?.toString() ?? ''
-          : '';
-      alternativaDController.text = alternativas.length > 3
-          ? alternativas[3]['texto']?.toString() ?? ''
-          : '';
+    alternativaAController.text = alternativas.length > 0
+        ? alternativas[0]['texto']?.toString() ?? ''
+        : '';
+    alternativaBController.text = alternativas.length > 1
+        ? alternativas[1]['texto']?.toString() ?? ''
+        : '';
+    alternativaCController.text = alternativas.length > 2
+        ? alternativas[2]['texto']?.toString() ?? ''
+        : '';
+    alternativaDController.text = alternativas.length > 3
+        ? alternativas[3]['texto']?.toString() ?? ''
+        : '';
 
-      for (int i = 0; i < alternativas.length && i < 4; i++) {
-        if (alternativas[i]['correta'] == 1) {
-          alternativaCorreta = ['A', 'B', 'C', 'D'][i];
-        }
+    for (int i = 0; i < alternativas.length && i < 4; i++) {
+      if (alternativas[i]['correta'] == 1) {
+        alternativaCorreta = ['A', 'B', 'C', 'D'][i];
       }
     }
 
@@ -335,52 +333,32 @@ class _TelaFormularioEditarPerguntasState
   }
 
   Future<void> salvarEdicao() async {
-    final enunciado = perguntaController.text.trim();
-    final dica = dicaController.text.trim();
-    final alternativaA = alternativaAController.text.trim();
-    final alternativaB = alternativaBController.text.trim();
-    final alternativaC = alternativaCController.text.trim();
-    final alternativaD = alternativaDController.text.trim();
-
-    if (enunciado.isEmpty ||
-        dica.isEmpty ||
-        dificuldade == null ||
-        alternativaA.isEmpty ||
-        alternativaB.isEmpty ||
-        alternativaC.isEmpty ||
-        alternativaD.isEmpty ||
-        alternativaCorreta == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Preencha todos os campos')));
-      return;
-    }
-
     final sucesso = await DatabaseHelper.atualizarPerguntas(
       questaoId: widget.questaoId,
-      enunciado: enunciado,
-      dica: dica,
+      enunciado: perguntaController.text.trim(),
+      dica: dicaController.text.trim(),
       dificuldade: int.parse(dificuldade!),
-      alternativaA: alternativaA,
-      alternativaB: alternativaB,
-      alternativaC: alternativaC,
-      alternativaD: alternativaD,
+      alternativaA: alternativaAController.text.trim(),
+      alternativaB: alternativaBController.text.trim(),
+      alternativaC: alternativaCController.text.trim(),
+      alternativaD: alternativaDController.text.trim(),
       alternativaCorreta: alternativaCorreta!,
       caminhoImagem: caminhoImagem,
     );
 
     if (!mounted) return;
 
-    if (sucesso) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pergunta atualizada com sucesso')),
-      );
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao atualizar pergunta')),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          sucesso
+              ? 'Pergunta atualizada com sucesso'
+              : 'Erro ao atualizar pergunta',
+        ),
+      ),
+    );
+
+    if (sucesso) Navigator.pop(context);
   }
 
   Widget campoAlternativa(String letra, TextEditingController controller) {
@@ -529,33 +507,11 @@ class _TelaFormularioEditarPerguntasState
             right: 30,
             child: Image.asset('assets/images/logo_labmaster.png', width: 180),
           ),
-          Positioned(
-            top: 115,
-            left: 25,
-            child: SizedBox(
-              width: 110,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[700],
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text(
-                  'Voltar',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-              ),
-            ),
-          ),
 
           SingleChildScrollView(
             padding: EdgeInsets.only(
               top: caminhoImagem == null ? 55 : 30,
-              bottom: 30,
+              bottom: 90,
             ),
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: size.height - 60),
@@ -639,14 +595,6 @@ class _TelaFormularioEditarPerguntasState
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: dificuldade,
-                                hint: const Text(
-                                  'Dificuldade',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
                                 dropdownColor: Colors.grey[700],
                                 icon: const Icon(
                                   Icons.keyboard_arrow_down,
@@ -677,9 +625,7 @@ class _TelaFormularioEditarPerguntasState
                               ),
                             ),
                           ),
-
                           const SizedBox(width: 40),
-
                           SizedBox(
                             width: isMobile ? size.width * 0.42 : 310,
                             height: 60,
@@ -822,6 +768,29 @@ class _TelaFormularioEditarPerguntasState
                       ),
                     ],
                   ),
+                ),
+              ),
+            ),
+          ),
+
+          Positioned(
+            bottom: 30,
+            right: 30,
+            child: SizedBox(
+              width: 110,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[700],
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text(
+                  'Voltar',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
             ),
