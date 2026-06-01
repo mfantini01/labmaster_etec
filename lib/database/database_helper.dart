@@ -428,16 +428,14 @@ class DatabaseHelper {
         });
       }
 
-      final dadosQuestao = {
+      final Map<String, dynamic> dadosQuestao = {
         'enunciado': enunciado,
         'dificuldade': dificuldade,
         'dica': dica,
         'ativa': 1,
       };
 
-      if (imagemId != null) {
-        dadosQuestao['imagem_id'] = imagemId;
-      }
+      dadosQuestao['imagem_id'] = imagemId;
 
       await db.update(
         'questoes',
@@ -468,6 +466,23 @@ class DatabaseHelper {
       }
 
       return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> excluirPergunta(int questaoId) async {
+    final db = await getDatabase();
+
+    try {
+      final linhasAfetadas = await db.update(
+        'questoes',
+        {'ativa': 0},
+        where: 'id = ?',
+        whereArgs: [questaoId],
+      );
+
+      return linhasAfetadas > 0;
     } catch (e) {
       return false;
     }
