@@ -258,6 +258,10 @@ class _TelaFormularioEditarPerguntasState
   String? dificuldade;
   String? caminhoImagem;
   String? alternativaCorreta = 'A';
+  String? imagemAlternativaA;
+  String? imagemAlternativaB;
+  String? imagemAlternativaC;
+  String? imagemAlternativaD;
   bool carregando = true;
 
   @override
@@ -311,6 +315,22 @@ class _TelaFormularioEditarPerguntasState
         ? alternativas[3]['texto']?.toString() ?? ''
         : '';
 
+    imagemAlternativaA = alternativas.length > 0
+        ? alternativas[0]['caminho_imagem_alternativa']?.toString()
+        : null;
+
+    imagemAlternativaB = alternativas.length > 1
+        ? alternativas[1]['caminho_imagem_alternativa']?.toString()
+        : null;
+
+    imagemAlternativaC = alternativas.length > 2
+        ? alternativas[2]['caminho_imagem_alternativa']?.toString()
+        : null;
+
+    imagemAlternativaD = alternativas.length > 3
+        ? alternativas[3]['caminho_imagem_alternativa']?.toString()
+        : null;
+
     for (int i = 0; i < alternativas.length && i < 4; i++) {
       if (alternativas[i]['correta'] == 1) {
         alternativaCorreta = ['A', 'B', 'C', 'D'][i];
@@ -332,6 +352,29 @@ class _TelaFormularioEditarPerguntasState
     }
   }
 
+  Future<void> escolherImagemAlternativa(String letra) async {
+    final resultado = await FilePicker.pickFiles(type: FileType.image);
+
+    if (resultado != null && resultado.files.first.path != null) {
+      setState(() {
+        switch (letra) {
+          case 'A':
+            imagemAlternativaA = resultado.files.first.path!;
+            break;
+          case 'B':
+            imagemAlternativaB = resultado.files.first.path!;
+            break;
+          case 'C':
+            imagemAlternativaC = resultado.files.first.path!;
+            break;
+          case 'D':
+            imagemAlternativaD = resultado.files.first.path!;
+            break;
+        }
+      });
+    }
+  }
+
   Future<void> salvarEdicao() async {
     final sucesso = await DatabaseHelper.atualizarPerguntas(
       questaoId: widget.questaoId,
@@ -344,6 +387,10 @@ class _TelaFormularioEditarPerguntasState
       alternativaD: alternativaDController.text.trim(),
       alternativaCorreta: alternativaCorreta!,
       caminhoImagem: caminhoImagem,
+      imagemAlternativaA: imagemAlternativaA,
+      imagemAlternativaB: imagemAlternativaB,
+      imagemAlternativaC: imagemAlternativaC,
+      imagemAlternativaD: imagemAlternativaD,
     );
 
     if (!mounted) return;
@@ -362,39 +409,119 @@ class _TelaFormularioEditarPerguntasState
   }
 
   Widget campoAlternativa(String letra, TextEditingController controller) {
+    String? imagem;
+
+    switch (letra) {
+      case 'A':
+        imagem = imagemAlternativaA;
+        break;
+      case 'B':
+        imagem = imagemAlternativaB;
+        break;
+      case 'C':
+        imagem = imagemAlternativaC;
+        break;
+      case 'D':
+        imagem = imagemAlternativaD;
+        break;
+    }
+
     return Container(
       width: 330,
-      height: 70,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.75),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
       ),
-      child: Row(
+      child: Column(
         children: [
-          CircleAvatar(
-            backgroundColor: const Color(0xFFC62828),
-            child: Text(
-              letra,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+          Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: const Color(0xFFC62828),
+                child: Text(
+                  letra,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                hintText: 'Digite a alternativa $letra',
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    hintText: 'Alternativa $letra',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 48,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () => escolherImagemAlternativa(letra),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[600],
+                    padding: EdgeInsets.zero,
+                  ),
+                  child: const Icon(Icons.image),
+                ),
+              ),
+            ],
+          ),
+
+          if (imagem != null && imagem.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              height: 170,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.grey.shade400),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.file(File(imagem), fit: BoxFit.cover),
               ),
             ),
-          ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              height: 42,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    switch (letra) {
+                      case 'A':
+                        imagemAlternativaA = null;
+                        break;
+                      case 'B':
+                        imagemAlternativaB = null;
+                        break;
+                      case 'C':
+                        imagemAlternativaC = null;
+                        break;
+                      case 'D':
+                        imagemAlternativaD = null;
+                        break;
+                    }
+                  });
+                },
+                icon: const Icon(Icons.delete_outline),
+                label: const Text('Remover imagem'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[600],
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

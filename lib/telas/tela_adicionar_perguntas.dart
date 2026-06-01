@@ -22,6 +22,10 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
   String? dificuldade;
   String? caminhoImagem;
   String? alternativaCorreta = 'A';
+  String? imagemAlternativaA;
+  String? imagemAlternativaB;
+  String? imagemAlternativaC;
+  String? imagemAlternativaD;
 
   @override
   void dispose() {
@@ -44,84 +48,203 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
     }
   }
 
+  Future<void> escolherImagemAlternativa(String letra) async {
+    final resultado = await FilePicker.pickFiles(type: FileType.image);
+
+    if (resultado != null && resultado.files.first.path != null) {
+      setState(() {
+        switch (letra) {
+          case 'A':
+            imagemAlternativaA = resultado.files.first.path!;
+            break;
+          case 'B':
+            imagemAlternativaB = resultado.files.first.path!;
+            break;
+          case 'C':
+            imagemAlternativaC = resultado.files.first.path!;
+            break;
+          case 'D':
+            imagemAlternativaD = resultado.files.first.path!;
+            break;
+        }
+      });
+    }
+  }
+
   Future<void> confirmarPerguntas() async {
-  final enunciado = perguntaController.text.trim();
-  final dica = dicaController.text.trim();
-  final alternativaA = alternativaAController.text.trim();
-  final alternativaB = alternativaBController.text.trim();
-  final alternativaC = alternativaCController.text.trim();
-  final alternativaD = alternativaDController.text.trim();
+    final enunciado = perguntaController.text.trim();
+    final dica = dicaController.text.trim();
+    final alternativaA = alternativaAController.text.trim();
+    final alternativaB = alternativaBController.text.trim();
+    final alternativaC = alternativaCController.text.trim();
+    final alternativaD = alternativaDController.text.trim();
 
-  if (enunciado.isEmpty ||
-      dica.isEmpty ||
-      dificuldade == null ||
-      alternativaA.isEmpty ||
-      alternativaB.isEmpty ||
-      alternativaC.isEmpty ||
-      alternativaD.isEmpty ||
-      alternativaCorreta == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Preencha todos os campos')),
+    if (enunciado.isEmpty ||
+        dica.isEmpty ||
+        dificuldade == null ||
+        (alternativaA.isEmpty && imagemAlternativaA == null) ||
+        (alternativaB.isEmpty && imagemAlternativaB == null) ||
+        (alternativaC.isEmpty && imagemAlternativaC == null) ||
+        (alternativaD.isEmpty && imagemAlternativaD == null) ||
+        alternativaCorreta == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Preencha todos os campos')));
+      return;
+    }
+
+    final sucesso = await DatabaseHelper.salvarPerguntas(
+      enunciado: enunciado,
+      dica: dica,
+      dificuldade: int.parse(dificuldade!),
+      alternativaA: alternativaA,
+      alternativaB: alternativaB,
+      alternativaC: alternativaC,
+      alternativaD: alternativaD,
+      alternativaCorreta: alternativaCorreta!,
+      caminhoImagem: caminhoImagem,
+      imagemAlternativaA: imagemAlternativaA,
+      imagemAlternativaB: imagemAlternativaB,
+      imagemAlternativaC: imagemAlternativaC,
+      imagemAlternativaD: imagemAlternativaD,
     );
-    return;
+
+    if (!mounted) return;
+
+    if (sucesso) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pergunta salva com sucesso')),
+      );
+
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Erro ao salvar pergunta')));
+    }
   }
-
-  final sucesso = await DatabaseHelper.salvarPerguntas(
-    enunciado: enunciado,
-    dica: dica,
-    dificuldade: int.parse(dificuldade!),
-    alternativaA: alternativaA,
-    alternativaB: alternativaB,
-    alternativaC: alternativaC,
-    alternativaD: alternativaD,
-    alternativaCorreta: alternativaCorreta!,
-    caminhoImagem: caminhoImagem,
-  );
-
-  if (!mounted) return;
-
-  if (sucesso) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Pergunta salva com sucesso')),
-    );
-
-    Navigator.pop(context);
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Erro ao salvar pergunta')),
-    );
-  }
-}
 
   Widget campoAlternativa(String letra, TextEditingController controller) {
+    String? imagem;
+
+    switch (letra) {
+      case 'A':
+        imagem = imagemAlternativaA;
+        break;
+      case 'B':
+        imagem = imagemAlternativaB;
+        break;
+      case 'C':
+        imagem = imagemAlternativaC;
+        break;
+      case 'D':
+        imagem = imagemAlternativaD;
+        break;
+    }
+
     return Container(
       width: 330,
-      height: 70,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.75),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
       ),
-      child: Row(
+      child: Column(
         children: [
-          CircleAvatar(
-            backgroundColor: const Color(0xFFC62828),
-            child: Text(
-              letra,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
+          Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: const Color(0xFFC62828),
+                child: Text(
+                  letra,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 10),
+
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    hintText: 'Alternativa $letra',
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              SizedBox(
+                width: 48,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () => escolherImagemAlternativa(letra),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[600],
+                    padding: EdgeInsets.zero,
+                  ),
+                  child: const Icon(Icons.image),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                hintText: 'Digite a alternativa $letra',
+
+          if (imagem != null) ...[
+            const SizedBox(height: 12),
+
+            Container(
+              width: double.infinity,
+              height: 170,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.grey.shade400),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.file(File(imagem), fit: BoxFit.cover),
               ),
             ),
-          ),
+
+            const SizedBox(height: 8),
+
+            SizedBox(
+              width: double.infinity,
+              height: 42,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    switch (letra) {
+                      case 'A':
+                        imagemAlternativaA = null;
+                        break;
+                      case 'B':
+                        imagemAlternativaB = null;
+                        break;
+                      case 'C':
+                        imagemAlternativaC = null;
+                        break;
+                      case 'D':
+                        imagemAlternativaD = null;
+                        break;
+                    }
+                  });
+                },
+                icon: const Icon(Icons.delete_outline),
+                label: const Text('Remover imagem'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[600],
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -175,12 +298,18 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset('assets/images/fundo_login.png', fit: BoxFit.cover),
+            child: Image.asset(
+              'assets/images/fundo_login.png',
+              fit: BoxFit.cover,
+            ),
           ),
           Positioned(
             top: 25,
             left: 25,
-            child: Image.asset('assets/images/logo_cps_semfundo.png', width: 115),
+            child: Image.asset(
+              'assets/images/logo_cps_semfundo.png',
+              width: 115,
+            ),
           ),
           Positioned(
             top: 30,
@@ -284,14 +413,27 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                                   ),
                                 ),
                                 dropdownColor: Colors.grey[700],
-                                icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                                icon: const Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Colors.white,
+                                ),
                                 isExpanded: true,
                                 items: const [
-                                  DropdownMenuItem(value: '1', child: Text('Fácil')),
-                                  DropdownMenuItem(value: '2', child: Text('Médio')),
-                                  DropdownMenuItem(value: '3', child: Text('Difícil')),
+                                  DropdownMenuItem(
+                                    value: '1',
+                                    child: Text('Fácil'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: '2',
+                                    child: Text('Médio'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: '3',
+                                    child: Text('Difícil'),
+                                  ),
                                 ],
-                                onChanged: (value) => setState(() => dificuldade = value),
+                                onChanged: (value) =>
+                                    setState(() => dificuldade = value),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
@@ -316,11 +458,15 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                                 ),
                               ),
                               child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'Imagem',
-                                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   Icon(Icons.add, size: 34),
                                 ],
@@ -339,25 +485,37 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.45),
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: Colors.grey.shade400, width: 2),
+                            border: Border.all(
+                              color: Colors.grey.shade400,
+                              width: 2,
+                            ),
                           ),
-                          child: Image.file(File(caminhoImagem!), fit: BoxFit.scaleDown),
+                          child: Image.file(
+                            File(caminhoImagem!),
+                            fit: BoxFit.scaleDown,
+                          ),
                         ),
                         const SizedBox(height: 18),
                         SizedBox(
                           width: double.infinity,
                           height: 52,
                           child: ElevatedButton.icon(
-                            onPressed: () => setState(() => caminhoImagem = null),
+                            onPressed: () =>
+                                setState(() => caminhoImagem = null),
                             icon: const Icon(Icons.delete_outline),
                             label: const Text(
                               'Desanexar imagem',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.grey[600],
                               foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
                           ),
                         ),
@@ -429,11 +587,16 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFB71C1C),
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
                           ),
                           child: const Text(
                             'CONFIRMAR',
-                            style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 23,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -455,7 +618,9 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[700],
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
                 child: const Text(
                   'Voltar',

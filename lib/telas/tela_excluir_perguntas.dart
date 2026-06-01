@@ -394,21 +394,74 @@ class _TelaFormularioExcluirPerguntasState
                         ),
                       const SizedBox(height: 24),
                       ...alternativas.map<Widget>((alternativa) {
-                        return Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: alternativa['correta'] == 1
-                                ? Colors.green.withOpacity(0.15)
-                                : Colors.white70,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            alternativa['texto'],
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                        final texto = alternativa['texto']?.toString() ?? '';
+                        final caminhoImagemAlternativa =
+                            alternativa['caminho_imagem_alternativa']
+                                ?.toString();
+
+                        final temImagem =
+                            caminhoImagemAlternativa != null &&
+                            caminhoImagemAlternativa.isNotEmpty;
+
+                        final correta = alternativa['correta'] == 1;
+
+                        return Center(
+                          child: Container(
+                            width: 560,
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: correta
+                                  ? Colors.green.withOpacity(0.13)
+                                  : Colors.white.withOpacity(0.75),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: correta
+                                    ? Colors.green
+                                    : Colors.grey.shade300,
+                                width: correta ? 2 : 1,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (texto.isNotEmpty)
+                                  Text(
+                                    texto,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: correta
+                                          ? Colors.green
+                                          : Colors.black87,
+                                    ),
+                                  ),
+
+                                if (temImagem) ...[
+                                  if (texto.isNotEmpty)
+                                    const SizedBox(height: 10),
+                                  Center(
+                                    child: Container(
+                                      width: 420,
+                                      height: 145,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: Colors.grey.shade300,
+                                        ),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.file(
+                                          File(caminhoImagemAlternativa),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
                         );

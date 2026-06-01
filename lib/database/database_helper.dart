@@ -263,13 +263,17 @@ class DatabaseHelper {
     required String alternativaD,
     required String alternativaCorreta,
     String? caminhoImagem,
+    String? imagemAlternativaA,
+    String? imagemAlternativaB,
+    String? imagemAlternativaC,
+    String? imagemAlternativaD,
   }) async {
     final db = await getDatabase();
 
     try {
       int? imagemId;
 
-      if (caminhoImagem != null) {
+      if (caminhoImagem != null && caminhoImagem.isNotEmpty) {
         imagemId = await db.insert('imagens', {
           'caminho': caminhoImagem,
           'descricao_alt': enunciado,
@@ -284,18 +288,36 @@ class DatabaseHelper {
         'ativa': 1,
       });
 
-      final alternativas = {
-        'A': alternativaA,
-        'B': alternativaB,
-        'C': alternativaC,
-        'D': alternativaD,
-      };
+      Future<int?> salvarImagemAlternativa(
+        String? caminho,
+        String descricao,
+      ) async {
+        if (caminho == null || caminho.isEmpty) return null;
 
-      for (final item in alternativas.entries) {
+        return await db.insert('imagens', {
+          'caminho': caminho,
+          'descricao_alt': descricao,
+        });
+      }
+
+      final alternativas = [
+        {'letra': 'A', 'texto': alternativaA, 'imagem': imagemAlternativaA},
+        {'letra': 'B', 'texto': alternativaB, 'imagem': imagemAlternativaB},
+        {'letra': 'C', 'texto': alternativaC, 'imagem': imagemAlternativaC},
+        {'letra': 'D', 'texto': alternativaD, 'imagem': imagemAlternativaD},
+      ];
+
+      for (final item in alternativas) {
+        final imagemAlternativaId = await salvarImagemAlternativa(
+          item['imagem'],
+          item['texto'] ?? '',
+        );
+
         await db.insert('alternativas', {
           'questao_id': questaoId,
-          'texto': item.value,
-          'correta': item.key == alternativaCorreta ? 1 : 0,
+          'texto': item['texto'],
+          'imagem_id': imagemAlternativaId,
+          'correta': item['letra'] == alternativaCorreta ? 1 : 0,
         });
       }
 
@@ -383,22 +405,26 @@ class DatabaseHelper {
 
     final questoes = await db.rawQuery(
       '''
-      SELECT q.*, i.caminho AS caminho_imagem
-      FROM questoes q
-      LEFT JOIN imagens i ON i.id = q.imagem_id
-      WHERE q.id = ?
-      LIMIT 1
-      ''',
+    SELECT q.*, i.caminho AS caminho_imagem
+    FROM questoes q
+    LEFT JOIN imagens i ON i.id = q.imagem_id
+    WHERE q.id = ?
+    LIMIT 1
+    ''',
       [questaoId],
     );
 
     if (questoes.isEmpty) return null;
 
-    final alternativas = await db.query(
-      'alternativas',
-      where: 'questao_id = ?',
-      whereArgs: [questaoId],
-      orderBy: 'id ASC',
+    final alternativas = await db.rawQuery(
+      '''
+    SELECT a.*, i.caminho AS caminho_imagem_alternativa
+    FROM alternativas a
+    LEFT JOIN imagens i ON i.id = a.imagem_id
+    WHERE a.questao_id = ?
+    ORDER BY a.id ASC
+    ''',
+      [questaoId],
     );
 
     return {'questao': questoes.first, 'alternativas': alternativas};
@@ -415,6 +441,10 @@ class DatabaseHelper {
     required String alternativaD,
     required String alternativaCorreta,
     String? caminhoImagem,
+    String? imagemAlternativaA,
+    String? imagemAlternativaB,
+    String? imagemAlternativaC,
+    String? imagemAlternativaD,
   }) async {
     final db = await getDatabase();
 
@@ -433,9 +463,8 @@ class DatabaseHelper {
         'dificuldade': dificuldade,
         'dica': dica,
         'ativa': 1,
+        'imagem_id': imagemId,
       };
-
-      dadosQuestao['imagem_id'] = imagemId;
 
       await db.update(
         'questoes',
@@ -450,18 +479,36 @@ class DatabaseHelper {
         whereArgs: [questaoId],
       );
 
-      final alternativas = {
-        'A': alternativaA,
-        'B': alternativaB,
-        'C': alternativaC,
-        'D': alternativaD,
-      };
+      Future<int?> salvarImagemAlternativa(
+        String? caminho,
+        String descricao,
+      ) async {
+        if (caminho == null || caminho.isEmpty) return null;
 
-      for (final item in alternativas.entries) {
+        return await db.insert('imagens', {
+          'caminho': caminho,
+          'descricao_alt': descricao,
+        });
+      }
+
+      final alternativas = [
+        {'letra': 'A', 'texto': alternativaA, 'imagem': imagemAlternativaA},
+        {'letra': 'B', 'texto': alternativaB, 'imagem': imagemAlternativaB},
+        {'letra': 'C', 'texto': alternativaC, 'imagem': imagemAlternativaC},
+        {'letra': 'D', 'texto': alternativaD, 'imagem': imagemAlternativaD},
+      ];
+
+      for (final item in alternativas) {
+        final imagemAlternativaId = await salvarImagemAlternativa(
+          item['imagem'],
+          item['texto'] ?? '',
+        );
+
         await db.insert('alternativas', {
           'questao_id': questaoId,
-          'texto': item.value,
-          'correta': item.key == alternativaCorreta ? 1 : 0,
+          'texto': item['texto'],
+          'imagem_id': imagemAlternativaId,
+          'correta': item['letra'] == alternativaCorreta ? 1 : 0,
         });
       }
 
