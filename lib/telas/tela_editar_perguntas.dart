@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 
@@ -37,6 +36,42 @@ class _TelaEditarPerguntasState extends State<TelaEditarPerguntas> {
     });
   }
 
+  Widget logoSuperior({required bool isMobile}) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: isMobile ? 18 : 25,
+        left: isMobile ? 18 : 25,
+        right: isMobile ? 18 : 30,
+      ),
+      child: Row(
+        mainAxisAlignment:
+            isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+        children: [
+          Image.asset(
+            'assets/images/logo_cps_semfundo.png',
+            width: isMobile ? 70 : 115,
+          ),
+          if (isMobile)
+            Image.asset(
+              'assets/images/logo_labmaster.png',
+              width: 95,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget logoLabMasterDesktop() {
+    return Positioned(
+      top: 30,
+      right: 30,
+      child: Image.asset(
+        'assets/images/logo_labmaster.png',
+        width: 180,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -52,180 +87,185 @@ class _TelaEditarPerguntasState extends State<TelaEditarPerguntas> {
             ),
           ),
 
+          if (!isMobile) logoLabMasterDesktop(),
+
           Positioned(
-            top: isMobile ? 20 : 30,
-            left: isMobile ? 20 : 30,
-            child: Image.asset(
-              'assets/images/logo_cps_semfundo.png',
-              width: isMobile ? 90 : 120,
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              child: logoSuperior(isMobile: isMobile),
             ),
           ),
 
-          Positioned(
-            top: isMobile ? 25 : 30,
-            right: isMobile ? 20 : 30,
-            child: Image.asset(
-              'assets/images/logo_labmaster.png',
-              width: isMobile ? 140 : 180,
-            ),
-          ),
-
-          Center(
+          SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 35),
-              child: SizedBox(
-                width: isMobile ? size.width * 0.88 : 700,
-                child: Column(
-                  children: [
-                    const Text(
-                      'Editar Perguntas',
-                      style: TextStyle(
-                        fontSize: 34,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFB71C1C),
-                      ),
-                    ),
-
-                    const SizedBox(height: 28),
-
-                    Container(
-                      width: double.infinity,
-                      height: 70,
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[600],
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: TextField(
-                        controller: pesquisaController,
-                        onChanged: pesquisar,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
+              padding: EdgeInsets.fromLTRB(
+                isMobile ? 22 : 24,
+                isMobile ? 120 : 105,
+                isMobile ? 22 : 24,
+                30,
+              ),
+              child: Center(
+                child: SizedBox(
+                  width: isMobile ? double.infinity : 700,
+                  child: Column(
+                    children: [
+                      Text(
+                        'Editar Perguntas',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: isMobile ? 30 : 34,
                           fontWeight: FontWeight.bold,
-                        ),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          icon: Icon(
-                            Icons.search,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                          hintText: 'Digite o enunciado da pergunta',
-                          hintStyle: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          color: const Color(0xFFB71C1C),
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 25),
+                      const SizedBox(height: 28),
 
-                    if (perguntas.isEmpty)
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(22),
+                        height: 70,
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.75),
+                          color: Colors.grey[600],
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Text(
-                          'Nenhuma pergunta encontrada',
-                          textAlign: TextAlign.center,
+                        child: TextField(
+                          controller: pesquisaController,
+                          onChanged: pesquisar,
                           style: TextStyle(
-                            fontSize: 20,
+                            color: Colors.white,
+                            fontSize: isMobile ? 19 : 22,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                          ),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            icon: const Icon(
+                              Icons.search,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                            hintText: isMobile
+                                ? 'Digite o enunciado da per...'
+                                : 'Digite o enunciado da pergunta',
+                            hintStyle: TextStyle(
+                              color: Colors.white70,
+                              fontSize: isMobile ? 19 : 22,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      )
-                    else
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: perguntas.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 14),
-                        itemBuilder: (context, index) {
-                          final pergunta = perguntas[index];
+                      ),
 
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      TelaFormularioEditarPerguntas(
-                                        questaoId: pergunta['id'],
-                                      ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(18),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.8),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: Colors.grey.shade300),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.edit,
-                                    color: Color(0xFFB71C1C),
-                                    size: 30,
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Text(
-                                      pergunta['enunciado'] ?? '',
-                                      style: const TextStyle(
-                                        fontSize: 19,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
+                      const SizedBox(height: 25),
+
+                      if (perguntas.isEmpty)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(22),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.75),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Text(
+                            'Nenhuma pergunta encontrada',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        )
+                      else
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: perguntas.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 14),
+                          itemBuilder: (context, index) {
+                            final pergunta = perguntas[index];
+
+                            return InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        TelaFormularioEditarPerguntas(
+                                      questaoId: pergunta['id'],
                                     ),
                                   ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 20,
-                                    color: Colors.black54,
-                                  ),
-                                ],
+                                );
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(18),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.8),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border:
+                                      Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.edit,
+                                      color: Color(0xFFB71C1C),
+                                      size: 30,
+                                    ),
+                                    const SizedBox(width: 14),
+                                    Expanded(
+                                      child: Text(
+                                        pergunta['enunciado'] ?? '',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: isMobile ? 17 : 19,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 20,
+                                      color: Colors.black54,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+                            );
+                          },
+                        ),
 
-          Positioned(
-            bottom: isMobile ? 20 : 30,
-            right: isMobile ? 20 : 30,
-            child: SizedBox(
-              width: isMobile ? 95 : 110,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[700],
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                      const SizedBox(height: 26),
+
+                      SizedBox(
+                        width: isMobile ? size.width * 0.65 : 265,
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey[700],
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Voltar',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 17,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                child: const Text(
-                  'Voltar',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
             ),
@@ -287,9 +327,9 @@ class _TelaFormularioEditarPerguntasState
     if (!mounted) return;
 
     if (dados == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Pergunta não encontrada')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pergunta não encontrada')),
+      );
       Navigator.pop(context);
       return;
     }
@@ -376,6 +416,13 @@ class _TelaFormularioEditarPerguntasState
   }
 
   Future<void> salvarEdicao() async {
+    if (dificuldade == null || alternativaCorreta == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha todos os campos')),
+      );
+      return;
+    }
+
     final sucesso = await DatabaseHelper.atualizarPerguntas(
       questaoId: widget.questaoId,
       enunciado: perguntaController.text.trim(),
@@ -409,6 +456,9 @@ class _TelaFormularioEditarPerguntasState
   }
 
   Widget campoAlternativa(String letra, TextEditingController controller) {
+    final size = MediaQuery.of(context).size;
+    final isMobile = size.width < 700;
+
     String? imagem;
 
     switch (letra) {
@@ -427,7 +477,7 @@ class _TelaFormularioEditarPerguntasState
     }
 
     return Container(
-      width: 330,
+      width: isMobile ? size.width * 0.84 : 330,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.75),
@@ -480,7 +530,7 @@ class _TelaFormularioEditarPerguntasState
             const SizedBox(height: 12),
             Container(
               width: double.infinity,
-              height: 170,
+              height: isMobile ? 130 : 170,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.grey.shade400),
@@ -566,7 +616,7 @@ class _TelaFormularioEditarPerguntasState
     );
   }
 
-  Widget imagemPreview() {
+  Widget imagemPreview({required bool isMobile}) {
     if (caminhoImagem == null || caminhoImagem!.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -592,7 +642,7 @@ class _TelaFormularioEditarPerguntasState
 
     return Container(
       width: double.infinity,
-      height: 230,
+      height: isMobile ? 180 : 230,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.45),
@@ -600,6 +650,42 @@ class _TelaFormularioEditarPerguntasState
         border: Border.all(color: Colors.grey.shade400, width: 2),
       ),
       child: Image.file(arquivo, fit: BoxFit.scaleDown),
+    );
+  }
+
+  Widget logoSuperior({required bool isMobile}) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: isMobile ? 18 : 25,
+        left: isMobile ? 18 : 25,
+        right: isMobile ? 18 : 30,
+      ),
+      child: Row(
+        mainAxisAlignment:
+            isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+        children: [
+          Image.asset(
+            'assets/images/logo_cps_semfundo.png',
+            width: isMobile ? 70 : 115,
+          ),
+          if (isMobile)
+            Image.asset(
+              'assets/images/logo_labmaster.png',
+              width: 95,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget logoLabMasterDesktop() {
+    return Positioned(
+      top: 30,
+      right: 30,
+      child: Image.asset(
+        'assets/images/logo_labmaster.png',
+        width: 180,
+      ),
     );
   }
 
@@ -613,6 +699,7 @@ class _TelaFormularioEditarPerguntasState
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           Positioned.fill(
@@ -621,38 +708,34 @@ class _TelaFormularioEditarPerguntasState
               fit: BoxFit.cover,
             ),
           ),
+
+          if (!isMobile) logoLabMasterDesktop(),
+
           Positioned(
-            top: 25,
-            left: 25,
-            child: Image.asset(
-              'assets/images/logo_cps_semfundo.png',
-              width: 115,
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              child: logoSuperior(isMobile: isMobile),
             ),
-          ),
-          Positioned(
-            top: 30,
-            right: 30,
-            child: Image.asset('assets/images/logo_labmaster.png', width: 180),
           ),
 
-          SingleChildScrollView(
-            padding: EdgeInsets.only(
-              top: caminhoImagem == null ? 55 : 30,
-              bottom: 90,
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: size.height - 60),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                isMobile ? 22 : 24,
+                isMobile ? 105 : 90,
+                isMobile ? 22 : 24,
+                30,
+              ),
               child: Center(
                 child: SizedBox(
-                  width: isMobile ? size.width * 0.88 : 680,
+                  width: isMobile ? double.infinity : 680,
                   child: Column(
-                    mainAxisAlignment: caminhoImagem == null
-                        ? MainAxisAlignment.center
-                        : MainAxisAlignment.start,
                     children: [
                       Container(
                         width: double.infinity,
-                        height: 105,
+                        height: isMobile ? 92 : 105,
                         padding: const EdgeInsets.symmetric(horizontal: 18),
                         decoration: BoxDecoration(
                           color: Colors.grey[600],
@@ -660,17 +743,18 @@ class _TelaFormularioEditarPerguntasState
                         ),
                         child: TextField(
                           controller: perguntaController,
-                          style: const TextStyle(
+                          maxLines: null,
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 24,
+                            fontSize: isMobile ? 20 : 24,
                             fontWeight: FontWeight.bold,
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Pergunta:',
                             hintStyle: TextStyle(
                               color: Colors.white70,
-                              fontSize: 26,
+                              fontSize: isMobile ? 22 : 26,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -681,7 +765,7 @@ class _TelaFormularioEditarPerguntasState
 
                       Container(
                         width: double.infinity,
-                        height: 72,
+                        height: isMobile ? 65 : 72,
                         padding: const EdgeInsets.symmetric(horizontal: 18),
                         decoration: BoxDecoration(
                           color: Colors.grey[500],
@@ -689,17 +773,17 @@ class _TelaFormularioEditarPerguntasState
                         ),
                         child: TextField(
                           controller: dicaController,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: isMobile ? 18 : 20,
                             fontWeight: FontWeight.bold,
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Dica:',
                             hintStyle: TextStyle(
                               color: Colors.white70,
-                              fontSize: 22,
+                              fontSize: isMobile ? 20 : 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -708,13 +792,15 @@ class _TelaFormularioEditarPerguntasState
 
                       const SizedBox(height: 18),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: isMobile ? 14 : 40,
+                        runSpacing: 14,
                         children: [
                           Container(
-                            width: isMobile ? size.width * 0.42 : 310,
+                            width: isMobile ? size.width * 0.38 : 310,
                             height: 60,
-                            padding: const EdgeInsets.symmetric(horizontal: 18),
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
                             decoration: BoxDecoration(
                               color: Colors.grey[600],
                               borderRadius: BorderRadius.circular(10),
@@ -744,17 +830,17 @@ class _TelaFormularioEditarPerguntasState
                                 ],
                                 onChanged: (value) =>
                                     setState(() => dificuldade = value),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 20,
+                                  fontSize: isMobile ? 17 : 20,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 40),
+
                           SizedBox(
-                            width: isMobile ? size.width * 0.42 : 310,
+                            width: isMobile ? size.width * 0.38 : 310,
                             height: 60,
                             child: ElevatedButton(
                               onPressed: escolherImagem,
@@ -765,18 +851,18 @@ class _TelaFormularioEditarPerguntasState
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'Imagem',
                                     style: TextStyle(
-                                      fontSize: 22,
+                                      fontSize: isMobile ? 18 : 22,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Icon(Icons.add, size: 34),
+                                  Icon(Icons.add, size: isMobile ? 28 : 34),
                                 ],
                               ),
                             ),
@@ -787,7 +873,7 @@ class _TelaFormularioEditarPerguntasState
                       if (caminhoImagem != null &&
                           caminhoImagem!.isNotEmpty) ...[
                         const SizedBox(height: 20),
-                        imagemPreview(),
+                        imagemPreview(isMobile: isMobile),
                         const SizedBox(height: 18),
                         SizedBox(
                           width: double.infinity,
@@ -893,31 +979,34 @@ class _TelaFormularioEditarPerguntasState
                           ),
                         ),
                       ),
+
+                      const SizedBox(height: 14),
+
+                      SizedBox(
+                        width: isMobile ? size.width * 0.65 : 265,
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey[700],
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Voltar',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 17,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
                     ],
                   ),
-                ),
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: 30,
-            right: 30,
-            child: SizedBox(
-              width: 110,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[700],
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text(
-                  'Voltar',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
             ),
