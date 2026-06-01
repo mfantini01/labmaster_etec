@@ -8,7 +8,8 @@ class TelaAdicionarPerguntas extends StatefulWidget {
   const TelaAdicionarPerguntas({super.key});
 
   @override
-  State<TelaAdicionarPerguntas> createState() => _TelaAdicionarPerguntasState();
+  State<TelaAdicionarPerguntas> createState() =>
+      _TelaAdicionarPerguntasState();
 }
 
 class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
@@ -38,38 +39,38 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
     super.dispose();
   }
 
-  Future<void> escolherImagem() async {
-    final resultado = await FilePicker.pickFiles(type: FileType.image);
+Future<void> escolherImagem() async {
+  final resultado = await FilePicker.pickFiles(type: FileType.image);
 
-    if (resultado != null && resultado.files.first.path != null) {
-      setState(() {
-        caminhoImagem = resultado.files.first.path!;
-      });
-    }
+  if (resultado != null && resultado.files.first.path != null) {
+    setState(() {
+      caminhoImagem = resultado.files.first.path!;
+    });
   }
+}
 
-  Future<void> escolherImagemAlternativa(String letra) async {
-    final resultado = await FilePicker.pickFiles(type: FileType.image);
+Future<void> escolherImagemAlternativa(String letra) async {
+  final resultado = await FilePicker.pickFiles(type: FileType.image);
 
-    if (resultado != null && resultado.files.first.path != null) {
-      setState(() {
-        switch (letra) {
-          case 'A':
-            imagemAlternativaA = resultado.files.first.path!;
-            break;
-          case 'B':
-            imagemAlternativaB = resultado.files.first.path!;
-            break;
-          case 'C':
-            imagemAlternativaC = resultado.files.first.path!;
-            break;
-          case 'D':
-            imagemAlternativaD = resultado.files.first.path!;
-            break;
-        }
-      });
-    }
+  if (resultado != null && resultado.files.first.path != null) {
+    setState(() {
+      switch (letra) {
+        case 'A':
+          imagemAlternativaA = resultado.files.first.path!;
+          break;
+        case 'B':
+          imagemAlternativaB = resultado.files.first.path!;
+          break;
+        case 'C':
+          imagemAlternativaC = resultado.files.first.path!;
+          break;
+        case 'D':
+          imagemAlternativaD = resultado.files.first.path!;
+          break;
+      }
+    });
   }
+}
 
   Future<void> confirmarPerguntas() async {
     final enunciado = perguntaController.text.trim();
@@ -87,9 +88,9 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
         (alternativaC.isEmpty && imagemAlternativaC == null) ||
         (alternativaD.isEmpty && imagemAlternativaD == null) ||
         alternativaCorreta == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Preencha todos os campos')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha todos os campos')),
+      );
       return;
     }
 
@@ -115,16 +116,18 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Pergunta salva com sucesso')),
       );
-
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Erro ao salvar pergunta')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erro ao salvar pergunta')),
+      );
     }
   }
 
   Widget campoAlternativa(String letra, TextEditingController controller) {
+    final size = MediaQuery.of(context).size;
+    final isMobile = size.width < 700;
+
     String? imagem;
 
     switch (letra) {
@@ -143,7 +146,7 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
     }
 
     return Container(
-      width: 330,
+      width: isMobile ? size.width * 0.84 : 330,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.75),
@@ -164,9 +167,7 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                   ),
                 ),
               ),
-
               const SizedBox(width: 10),
-
               Expanded(
                 child: TextField(
                   controller: controller,
@@ -178,9 +179,7 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                   ),
                 ),
               ),
-
               const SizedBox(width: 8),
-
               SizedBox(
                 width: 48,
                 height: 48,
@@ -195,13 +194,11 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
               ),
             ],
           ),
-
           if (imagem != null) ...[
             const SizedBox(height: 12),
-
             Container(
               width: double.infinity,
-              height: 170,
+              height: isMobile ? 130 : 170,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.grey.shade400),
@@ -211,9 +208,7 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                 child: Image.file(File(imagem), fit: BoxFit.cover),
               ),
             ),
-
             const SizedBox(height: 8),
-
             SizedBox(
               width: double.infinity,
               height: 42,
@@ -289,12 +284,49 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
     );
   }
 
+  Widget logoSuperior({required bool isMobile}) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: isMobile ? 18 : 25,
+        left: isMobile ? 18 : 25,
+        right: isMobile ? 18 : 30,
+      ),
+      child: Row(
+        mainAxisAlignment:
+            isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+        children: [
+          Image.asset(
+            'assets/images/logo_cps_semfundo.png',
+            width: isMobile ? 70 : 115,
+          ),
+          if (isMobile)
+            Image.asset(
+              'assets/images/logo_labmaster.png',
+              width: 95,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget logoLabMasterDesktop() {
+    return Positioned(
+      top: 30,
+      right: 30,
+      child: Image.asset(
+        'assets/images/logo_labmaster.png',
+        width: 180,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 700;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           Positioned.fill(
@@ -303,38 +335,34 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
               fit: BoxFit.cover,
             ),
           ),
+
+          if (!isMobile) logoLabMasterDesktop(),
+
           Positioned(
-            top: 25,
-            left: 25,
-            child: Image.asset(
-              'assets/images/logo_cps_semfundo.png',
-              width: 115,
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              child: logoSuperior(isMobile: isMobile),
             ),
-          ),
-          Positioned(
-            top: 30,
-            right: 30,
-            child: Image.asset('assets/images/logo_labmaster.png', width: 180),
           ),
 
-          SingleChildScrollView(
-            padding: EdgeInsets.only(
-              top: caminhoImagem == null ? 55 : 30,
-              bottom: 30,
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: size.height - 60),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                isMobile ? 22 : 24,
+                isMobile ? 105 : 90,
+                isMobile ? 22 : 24,
+                30,
+              ),
               child: Center(
                 child: SizedBox(
-                  width: isMobile ? size.width * 0.88 : 680,
+                  width: isMobile ? double.infinity : 680,
                   child: Column(
-                    mainAxisAlignment: caminhoImagem == null
-                        ? MainAxisAlignment.center
-                        : MainAxisAlignment.start,
                     children: [
                       Container(
                         width: double.infinity,
-                        height: 105,
+                        height: isMobile ? 92 : 105,
                         padding: const EdgeInsets.symmetric(horizontal: 18),
                         decoration: BoxDecoration(
                           color: Colors.grey[600],
@@ -342,17 +370,18 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                         ),
                         child: TextField(
                           controller: perguntaController,
-                          style: const TextStyle(
+                          maxLines: null,
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 24,
+                            fontSize: isMobile ? 20 : 24,
                             fontWeight: FontWeight.bold,
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Pergunta:',
                             hintStyle: TextStyle(
                               color: Colors.white70,
-                              fontSize: 26,
+                              fontSize: isMobile ? 22 : 26,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -363,7 +392,7 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
 
                       Container(
                         width: double.infinity,
-                        height: 72,
+                        height: isMobile ? 65 : 72,
                         padding: const EdgeInsets.symmetric(horizontal: 18),
                         decoration: BoxDecoration(
                           color: Colors.grey[500],
@@ -371,17 +400,17 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                         ),
                         child: TextField(
                           controller: dicaController,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: isMobile ? 18 : 20,
                             fontWeight: FontWeight.bold,
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Dica:',
                             hintStyle: TextStyle(
                               color: Colors.white70,
-                              fontSize: 22,
+                              fontSize: isMobile ? 20 : 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -390,13 +419,15 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
 
                       const SizedBox(height: 18),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: isMobile ? 14 : 40,
+                        runSpacing: 14,
                         children: [
                           Container(
-                            width: isMobile ? size.width * 0.42 : 310,
+                            width: isMobile ? size.width * 0.38 : 310,
                             height: 60,
-                            padding: const EdgeInsets.symmetric(horizontal: 18),
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
                             decoration: BoxDecoration(
                               color: Colors.grey[600],
                               borderRadius: BorderRadius.circular(10),
@@ -404,11 +435,11 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: dificuldade,
-                                hint: const Text(
+                                hint: Text(
                                   'Dificuldade',
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 22,
+                                    fontSize: isMobile ? 18 : 22,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -434,19 +465,17 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                                 ],
                                 onChanged: (value) =>
                                     setState(() => dificuldade = value),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 20,
+                                  fontSize: isMobile ? 17 : 20,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                           ),
 
-                          const SizedBox(width: 40),
-
                           SizedBox(
-                            width: isMobile ? size.width * 0.42 : 310,
+                            width: isMobile ? size.width * 0.38 : 310,
                             height: 60,
                             child: ElevatedButton(
                               onPressed: escolherImagem,
@@ -457,18 +486,18 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'Imagem',
                                     style: TextStyle(
-                                      fontSize: 22,
+                                      fontSize: isMobile ? 18 : 22,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Icon(Icons.add, size: 34),
+                                  Icon(Icons.add, size: isMobile ? 28 : 34),
                                 ],
                               ),
                             ),
@@ -600,31 +629,34 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
                           ),
                         ),
                       ),
+
+                      const SizedBox(height: 14),
+
+                      SizedBox(
+                        width: isMobile ? size.width * 0.65 : 265,
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey[700],
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Voltar',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 17,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
                     ],
                   ),
-                ),
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: 30,
-            right: 30,
-            child: SizedBox(
-              width: 110,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[700],
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text(
-                  'Voltar',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
             ),
