@@ -534,4 +534,36 @@ class DatabaseHelper {
       return false;
     }
   }
+
+  static Future<List<Map<String, dynamic>>> buscarPerguntasParaJogo() async {
+    final db = await getDatabase();
+
+    final questoes = await db.rawQuery('''
+    SELECT q.*, i.caminho AS caminho_imagem
+    FROM questoes q
+    LEFT JOIN imagens i ON i.id = q.imagem_id
+    WHERE q.ativa = 1
+    ORDER BY RANDOM()
+    LIMIT 10
+  ''');
+
+    List<Map<String, dynamic>> resultado = [];
+
+    for (final questao in questoes) {
+      final alternativas = await db.rawQuery(
+        '''
+      SELECT a.*, i.caminho AS caminho_imagem_alternativa
+      FROM alternativas a
+      LEFT JOIN imagens i ON i.id = a.imagem_id
+      WHERE a.questao_id = ?
+      ORDER BY a.id ASC
+    ''',
+        [questao['id']],
+      );
+
+      resultado.add({'questao': questao, 'alternativas': alternativas});
+    }
+
+    return resultado;
+  }
 }

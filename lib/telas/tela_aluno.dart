@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'tela_editar_perfil.dart';
+import 'tela_jogo.dart';
 
 class TelaAluno extends StatelessWidget {
   final String email;
   final String senha;
 
-  const TelaAluno({
-    super.key,
-    required this.email,
-    required this.senha,
-  });
+  const TelaAluno({super.key, required this.email, required this.senha});
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +56,12 @@ class TelaAluno extends StatelessWidget {
                         texto: 'Jogar',
                         width: isMobile ? size.width * 0.72 : 270,
                         onPressed: () {
-                          debugPrint('Jogar clicado');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TelaJogo(),
+                            ),
+                          );
                         },
                       ),
 
