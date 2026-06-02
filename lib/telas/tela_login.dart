@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 import 'tela_cadastro.dart';
 import 'tela_professor.dart';
-import 'tela_inicial.dart';
 import 'tela_aluno.dart';
 
 class LoginScreen extends StatefulWidget {
