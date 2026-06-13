@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/auth_provider.dart';
 import 'tela_editar_perfil.dart';
 import 'tela_jogo.dart';
+import 'tela_login.dart';
 
 class TelaAluno extends StatelessWidget {
   final String email;
   final String senha;
 
   const TelaAluno({super.key, required this.email, required this.senha});
+
+  Future<void> fazerLogout(BuildContext context) async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+
+    await auth.logout();
+
+    if (!context.mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +39,6 @@ class TelaAluno extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-
           Positioned(
             top: isMobile ? 28 : 35,
             left: isMobile ? 24 : 38,
@@ -32,7 +48,6 @@ class TelaAluno extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-
           Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -44,9 +59,7 @@ class TelaAluno extends StatelessWidget {
                     width: isMobile ? size.width * 0.9 : 720,
                     fit: BoxFit.contain,
                   ),
-
                   SizedBox(height: isMobile ? 35 : 45),
-
                   Wrap(
                     spacing: isMobile ? 0 : 40,
                     runSpacing: 20,
@@ -64,7 +77,6 @@ class TelaAluno extends StatelessWidget {
                           );
                         },
                       ),
-
                       _BotaoAluno(
                         texto: 'Editar Perfil',
                         width: isMobile ? size.width * 0.72 : 270,
@@ -83,6 +95,25 @@ class TelaAluno extends StatelessWidget {
                     ],
                   ),
                 ],
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 30,
+            right: 30,
+            child: SizedBox(
+              width: isMobile ? 90 : 100,
+              height: isMobile ? 45 : 50,
+              child: ElevatedButton(
+                onPressed: () => fazerLogout(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[700],
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text('Sair'),
               ),
             ),
           ),

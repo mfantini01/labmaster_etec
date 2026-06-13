@@ -252,6 +252,24 @@ class DatabaseHelper {
 
     return resultado.first['tipo'] as String;
   }
+  static Future<Map<String, dynamic>?> buscarUsuario(
+  String email,
+  String senha,
+) async {
+  final db = await getDatabase();
+
+  final resultado = await db.query(
+    'usuarios',
+    columns: ['id', 'nome', 'email', 'tipo'],
+    where: 'email = ? AND senha_hash = ? AND ativo = 1',
+    whereArgs: [email, senha],
+    limit: 1,
+  );
+
+  if (resultado.isEmpty) return null;
+
+  return resultado.first;
+}
 
   static Future<bool> salvarPerguntas({
     required String enunciado,

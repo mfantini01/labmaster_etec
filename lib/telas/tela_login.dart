@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../database/database_helper.dart';
+import '../providers/auth_provider.dart';
 import 'tela_cadastro.dart';
 import 'tela_professor.dart';
 import 'tela_aluno.dart';
@@ -16,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final senhaController = TextEditingController();
 
   bool mostrarSenha = false;
-  
+
   @override
   void dispose() {
     emailController.dispose();
@@ -24,47 +27,62 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-Future<void> fazerLogin() async {
-  final email = emailController.text.trim();
-  final senha = senhaController.text.trim();
+  Future<void> fazerLogin() async {
+    final email = emailController.text.trim();
+    final senha = senhaController.text.trim();
 
-  if (email.isEmpty || senha.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Preencha email e senha')),
-    );
-    return;
-  }
-
-  final tipoUsuario = await DatabaseHelper.buscarTipoUsuario(email, senha);
-
-  if (!mounted) return;
-
-  if (tipoUsuario != null) {
-    if (tipoUsuario == 'professor') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfessorScreen()),
+    if (email.isEmpty || senha.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha email e senha')),
       );
-    } else {
-      Navigator.pushReplacement(
+      return;
+    }
+
+    final usuario = await DatabaseHelper.buscarUsuario(email, senha);
+
+    if (!mounted) return;
+
+    if (usuario != null) {
+      final authProvider = Provider.of<AuthProvider>(
         context,
-        MaterialPageRoute(
-          builder: (context) => TelaAluno(
-            email: email,
-            senha: senha,
+        listen: false,
+      );
+
+      await authProvider.login(
+        usuarioId: usuario['id'] as int,
+        nome: usuario['nome'] as String,
+        tipoUsuario: usuario['tipo'] as String,
+      );
+
+      if (!mounted) return;
+
+      final tipoUsuario = usuario['tipo'] as String;
+
+      if (tipoUsuario == 'professor') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const ProfessorScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TelaAluno(
+              email: email,
+              senha: senha,
+            ),
           ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Usuário não encontrado ou senha incorreta'),
+          backgroundColor: Colors.red,
         ),
       );
     }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Usuário não encontrado ou senha incorreta'),
-        backgroundColor: Colors.red,
-      ),
-    );
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +96,6 @@ Future<void> fazerLogin() async {
               fit: BoxFit.cover,
             ),
           ),
-
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -91,7 +108,7 @@ Future<void> fazerLogin() async {
                       borderRadius: BorderRadius.circular(18),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.12),
+                          color: Colors.black.withValues(alpha: 0.12),
                           blurRadius: 30,
                           offset: const Offset(0, 12),
                         ),
@@ -117,9 +134,7 @@ Future<void> fazerLogin() async {
                                 width: 145,
                                 fit: BoxFit.contain,
                               ),
-
                               const SizedBox(height: 8),
-
                               const Text(
                                 'Acesse sua conta',
                                 style: TextStyle(
@@ -131,7 +146,6 @@ Future<void> fazerLogin() async {
                             ],
                           ),
                         ),
-
                         Padding(
                           padding: const EdgeInsets.fromLTRB(40, 38, 40, 24),
                           child: Column(
@@ -145,7 +159,6 @@ Future<void> fazerLogin() async {
                                 ),
                               ),
                               const SizedBox(height: 12),
-
                               TextField(
                                 controller: emailController,
                                 keyboardType: TextInputType.emailAddress,
@@ -156,9 +169,7 @@ Future<void> fazerLogin() async {
                                   ),
                                 ),
                               ),
-
                               const SizedBox(height: 26),
-
                               const Text(
                                 'Senha',
                                 style: TextStyle(
@@ -167,17 +178,14 @@ Future<void> fazerLogin() async {
                                 ),
                               ),
                               const SizedBox(height: 12),
-
                               TextField(
                                 controller: senhaController,
                                 obscureText: !mostrarSenha,
                                 decoration: InputDecoration(
                                   hintText: 'Digite sua senha',
-
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       mostrarSenha
@@ -192,9 +200,7 @@ Future<void> fazerLogin() async {
                                   ),
                                 ),
                               ),
-
                               const SizedBox(height: 30),
-
                               SizedBox(
                                 width: double.infinity,
                                 height: 60,
@@ -217,9 +223,7 @@ Future<void> fazerLogin() async {
                                   ),
                                 ),
                               ),
-
                               const SizedBox(height: 14),
-
                               Center(
                                 child: TextButton(
                                   onPressed: () {
@@ -245,7 +249,6 @@ Future<void> fazerLogin() async {
                             ],
                           ),
                         ),
-
                         Container(
                           height: 60,
                           width: double.infinity,

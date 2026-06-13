@@ -1,9 +1,25 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
+import 'package:provider/provider.dart';
+
+import '../providers/auth_provider.dart';
+import 'tela_login.dart';
 import 'tela_perguntas.dart';
 
 class ProfessorScreen extends StatelessWidget {
   const ProfessorScreen({super.key});
+
+  Future<void> fazerLogout(BuildContext context) async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+
+    await auth.logout();
+
+    if (!context.mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +35,6 @@ class ProfessorScreen extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-
           Positioned(
             top: isMobile ? 20 : 30,
             left: isMobile ? 20 : 30,
@@ -28,7 +43,6 @@ class ProfessorScreen extends StatelessWidget {
               width: isMobile ? 90 : 120,
             ),
           ),
-
           Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -40,9 +54,7 @@ class ProfessorScreen extends StatelessWidget {
                     width: isMobile ? size.width * 0.9 : 700,
                     fit: BoxFit.contain,
                   ),
-
                   SizedBox(height: isMobile ? 35 : 55),
-
                   Wrap(
                     spacing: isMobile ? 0 : 55,
                     runSpacing: 20,
@@ -75,7 +87,6 @@ class ProfessorScreen extends StatelessWidget {
               ),
             ),
           ),
-
           Positioned(
             bottom: 30,
             right: 30,
@@ -83,9 +94,7 @@ class ProfessorScreen extends StatelessWidget {
               width: isMobile ? 90 : 100,
               height: isMobile ? 45 : 50,
               child: ElevatedButton(
-                onPressed: () {
-                  exit(0);
-                },
+                onPressed: () => fazerLogout(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[700],
                   foregroundColor: Colors.white,
