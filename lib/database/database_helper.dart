@@ -584,4 +584,109 @@ class DatabaseHelper {
 
     return resultado;
   }
+  static Future<List<Map<String, dynamic>>> pesquisarUsuarios(String termo) async {
+  final db = await getDatabase();
+
+  final todos = await db.query(
+    'usuarios',
+    where: 'ativo = 1',
+    orderBy: 'id DESC',
+  );
+
+  if (termo.trim().isEmpty) {
+    return todos;
+  }
+
+  String normalizar(String texto) {
+    return texto
+        .toLowerCase()
+        .replaceAll('á', 'a')
+        .replaceAll('à', 'a')
+        .replaceAll('ã', 'a')
+        .replaceAll('â', 'a')
+        .replaceAll('é', 'e')
+        .replaceAll('ê', 'e')
+        .replaceAll('í', 'i')
+        .replaceAll('ó', 'o')
+        .replaceAll('ô', 'o')
+        .replaceAll('õ', 'o')
+        .replaceAll('ú', 'u')
+        .replaceAll('ç', 'c');
+  }
+
+  final termoNormalizado = normalizar(termo);
+
+  return todos.where((usuario) {
+    final nome = normalizar(usuario['nome']?.toString() ?? '');
+    final email = normalizar(usuario['email']?.toString() ?? '');
+
+    return nome.contains(termoNormalizado) ||
+        email.contains(termoNormalizado);
+  }).toList();
+}
+
+static Future<Map<String, dynamic>?> buscarUsuarioPorId(int usuarioId) async {
+  final db = await getDatabase();
+
+  final resultado = await db.query(
+    'usuarios',
+    columns: ['id', 'nome', 'email', 'tipo', 'ativo'],
+    where: 'id = ? AND ativo = 1',
+    whereArgs: [usuarioId],
+    limit: 1,
+  );
+
+  if (resultado.isEmpty) return null;
+
+  return resultado.first;
+}
+
+static Future<bool> atualizarUsuarioPorId({
+  required int usuarioId,
+  required String nome,
+  required String email,
+  String? senha,
+  required String tipoUsuario,
+}) async {
+  final db = await getDatabase();
+
+  try {
+    final dados = <String, dynamic>{
+      'nome': nome,
+      'email': email,
+      'tipo': tipoUsuario,
+    };
+
+    if (senha != null && senha.isNotEmpty) {
+      dados['senha_hash'] = senha;
+    }
+
+    final linhasAfetadas = await db.update(
+      'usuarios',
+      dados,
+      where: 'id = ?',
+      whereArgs: [usuarioId],
+    );
+
+    return linhasAfetadas > 0;
+  } catch (e) {
+    return false;
+  }
+}
+static Future<bool> excluirUsuario(int usuarioId) async {
+  final db = await getDatabase();
+
+  try {
+    final linhasAfetadas = await db.update(
+      'usuarios',
+      {'ativo': 0},
+      where: 'id = ?',
+      whereArgs: [usuarioId],
+    );
+
+    return linhasAfetadas > 0;
+  } catch (e) {
+    return false;
+  }
+}
 }
