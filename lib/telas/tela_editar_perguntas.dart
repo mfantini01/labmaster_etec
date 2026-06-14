@@ -44,18 +44,16 @@ class _TelaEditarPerguntasState extends State<TelaEditarPerguntas> {
         right: isMobile ? 18 : 30,
       ),
       child: Row(
-        mainAxisAlignment:
-            isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+        mainAxisAlignment: isMobile
+            ? MainAxisAlignment.spaceBetween
+            : MainAxisAlignment.start,
         children: [
           Image.asset(
             'assets/images/logo_cps_semfundo.png',
             width: isMobile ? 70 : 115,
           ),
           if (isMobile)
-            Image.asset(
-              'assets/images/logo_labmaster.png',
-              width: 95,
-            ),
+            Image.asset('assets/images/logo_labmaster.png', width: 95),
         ],
       ),
     );
@@ -65,10 +63,7 @@ class _TelaEditarPerguntasState extends State<TelaEditarPerguntas> {
     return Positioned(
       top: 30,
       right: 30,
-      child: Image.asset(
-        'assets/images/logo_labmaster.png',
-        width: 180,
-      ),
+      child: Image.asset('assets/images/logo_labmaster.png', width: 180),
     );
   }
 
@@ -78,199 +73,204 @@ class _TelaEditarPerguntasState extends State<TelaEditarPerguntas> {
     final isMobile = size.width < 700;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/fundo_login.png',
-              fit: BoxFit.cover,
-            ),
+      backgroundColor: Colors.white,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/fundo_login.png'),
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
           ),
+        ),
+        child: Stack(
+          children: [
+            if (!isMobile) logoLabMasterDesktop(),
 
-          if (!isMobile) logoLabMasterDesktop(),
-
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: logoSuperior(isMobile: isMobile),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(child: logoSuperior(isMobile: isMobile)),
             ),
-          ),
 
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                isMobile ? 22 : 24,
-                isMobile ? 120 : 105,
-                isMobile ? 22 : 24,
-                30,
-              ),
-              child: Center(
-                child: SizedBox(
-                  width: isMobile ? double.infinity : 700,
-                  child: Column(
-                    children: [
-                      Text(
-                        'Editar Perguntas',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: isMobile ? 30 : 34,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFFB71C1C),
-                        ),
-                      ),
-
-                      const SizedBox(height: 28),
-
-                      Container(
-                        width: double.infinity,
-                        height: 70,
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[600],
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: TextField(
-                          controller: pesquisaController,
-                          onChanged: pesquisar,
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  isMobile ? 22 : 24,
+                  isMobile ? 95 : 80,
+                  isMobile ? 22 : 24,
+                  30,
+                ),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: SizedBox(
+                    width: isMobile ? double.infinity : 700,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Editar Perguntas',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white,
-                            fontSize: isMobile ? 19 : 22,
+                            fontSize: isMobile ? 30 : 34,
                             fontWeight: FontWeight.bold,
+                            color: const Color(0xFFB71C1C),
                           ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            icon: const Icon(
-                              Icons.search,
+                        ),
+
+                        const SizedBox(height: 28),
+
+                        Container(
+                          width: double.infinity,
+                          height: 70,
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[600],
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: TextField(
+                            controller: pesquisaController,
+                            onChanged: pesquisar,
+                            style: TextStyle(
                               color: Colors.white,
-                              size: 30,
-                            ),
-                            hintText: isMobile
-                                ? 'Digite o enunciado da per...'
-                                : 'Digite o enunciado da pergunta',
-                            hintStyle: TextStyle(
-                              color: Colors.white70,
                               fontSize: isMobile ? 19 : 22,
                               fontWeight: FontWeight.bold,
                             ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 25),
-
-                      if (perguntas.isEmpty)
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(22),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.75),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: const Text(
-                            'Nenhuma pergunta encontrada',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              icon: const Icon(
+                                Icons.search,
+                                color: Colors.white,
+                                size: 30,
+                              ),
+                              hintText: isMobile
+                                  ? 'Digite o enunciado da per...'
+                                  : 'Digite o enunciado da pergunta',
+                              hintStyle: TextStyle(
+                                color: Colors.white70,
+                                fontSize: isMobile ? 19 : 22,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        )
-                      else
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: perguntas.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 14),
-                          itemBuilder: (context, index) {
-                            final pergunta = perguntas[index];
+                        ),
 
-                            return InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        TelaFormularioEditarPerguntas(
-                                      questaoId: pergunta['id'],
+                        const SizedBox(height: 25),
+
+                        if (perguntas.isEmpty)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(22),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.75),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Text(
+                              'Nenhuma pergunta encontrada',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          )
+                        else
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: perguntas.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 14),
+                            itemBuilder: (context, index) {
+                              final pergunta = perguntas[index];
+
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          TelaFormularioEditarPerguntas(
+                                            questaoId: pergunta['id'],
+                                          ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.8),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
                                     ),
                                   ),
-                                );
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(18),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.8),
-                                  borderRadius: BorderRadius.circular(14),
-                                  border:
-                                      Border.all(color: Colors.grey.shade300),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.edit,
-                                      color: Color(0xFFB71C1C),
-                                      size: 30,
-                                    ),
-                                    const SizedBox(width: 14),
-                                    Expanded(
-                                      child: Text(
-                                        pergunta['enunciado'] ?? '',
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: isMobile ? 17 : 19,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.edit,
+                                        color: Color(0xFFB71C1C),
+                                        size: 30,
+                                      ),
+                                      const SizedBox(width: 14),
+                                      Expanded(
+                                        child: Text(
+                                          pergunta['enunciado'] ?? '',
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: isMobile ? 17 : 19,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    const Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: 20,
-                                      color: Colors.black54,
-                                    ),
-                                  ],
+                                      const Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 20,
+                                        color: Colors.black54,
+                                      ),
+                                    ],
+                                  ),
                                 ),
+                              );
+                            },
+                          ),
+
+                        const SizedBox(height: 26),
+
+                        SizedBox(
+                          width: isMobile ? size.width * 0.65 : 265,
+                          height: 54,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey[700],
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                            );
-                          },
-                        ),
-
-                      const SizedBox(height: 26),
-
-                      SizedBox(
-                        width: isMobile ? size.width * 0.65 : 265,
-                        height: 54,
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[700],
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
                             ),
-                          ),
-                          child: const Text(
-                            'Voltar',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17,
+                            child: const Text(
+                              'Voltar',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -327,9 +327,9 @@ class _TelaFormularioEditarPerguntasState
     if (!mounted) return;
 
     if (dados == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pergunta não encontrada')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Pergunta não encontrada')));
       Navigator.pop(context);
       return;
     }
@@ -417,9 +417,9 @@ class _TelaFormularioEditarPerguntasState
 
   Future<void> salvarEdicao() async {
     if (dificuldade == null || alternativaCorreta == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha todos os campos')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Preencha todos os campos')));
       return;
     }
 
@@ -661,18 +661,16 @@ class _TelaFormularioEditarPerguntasState
         right: isMobile ? 18 : 30,
       ),
       child: Row(
-        mainAxisAlignment:
-            isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+        mainAxisAlignment: isMobile
+            ? MainAxisAlignment.spaceBetween
+            : MainAxisAlignment.start,
         children: [
           Image.asset(
             'assets/images/logo_cps_semfundo.png',
             width: isMobile ? 70 : 115,
           ),
           if (isMobile)
-            Image.asset(
-              'assets/images/logo_labmaster.png',
-              width: 95,
-            ),
+            Image.asset('assets/images/logo_labmaster.png', width: 95),
         ],
       ),
     );
@@ -682,10 +680,7 @@ class _TelaFormularioEditarPerguntasState
     return Positioned(
       top: 30,
       right: 30,
-      child: Image.asset(
-        'assets/images/logo_labmaster.png',
-        width: 180,
-      ),
+      child: Image.asset('assets/images/logo_labmaster.png', width: 180),
     );
   }
 
@@ -700,318 +695,324 @@ class _TelaFormularioEditarPerguntasState
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/fundo_login.png',
-              fit: BoxFit.cover,
-            ),
+      backgroundColor: Colors.white,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/fundo_login.png'),
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
           ),
+        ),
+        child: Stack(
+          children: [
+            if (!isMobile) logoLabMasterDesktop(),
 
-          if (!isMobile) logoLabMasterDesktop(),
-
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: logoSuperior(isMobile: isMobile),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(child: logoSuperior(isMobile: isMobile)),
             ),
-          ),
 
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                isMobile ? 22 : 24,
-                isMobile ? 105 : 90,
-                isMobile ? 22 : 24,
-                30,
-              ),
-              child: Center(
-                child: SizedBox(
-                  width: isMobile ? double.infinity : 680,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        height: isMobile ? 92 : 105,
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[600],
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: TextField(
-                          controller: perguntaController,
-                          maxLines: null,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: isMobile ? 20 : 24,
-                            fontWeight: FontWeight.bold,
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  isMobile ? 22 : 24,
+                  isMobile ? 105 : 90,
+                  isMobile ? 22 : 24,
+                  30,
+                ),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: SizedBox(
+                    width: isMobile ? double.infinity : 680,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: isMobile ? 92 : 105,
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[600],
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Pergunta:',
-                            hintStyle: TextStyle(
-                              color: Colors.white70,
-                              fontSize: isMobile ? 22 : 26,
+                          child: TextField(
+                            controller: perguntaController,
+                            maxLines: null,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 20 : 24,
                               fontWeight: FontWeight.bold,
                             ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      Container(
-                        width: double.infinity,
-                        height: isMobile ? 65 : 72,
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[500],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: TextField(
-                          controller: dicaController,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: isMobile ? 18 : 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Dica:',
-                            hintStyle: TextStyle(
-                              color: Colors.white70,
-                              fontSize: isMobile ? 20 : 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: isMobile ? 14 : 40,
-                        runSpacing: 14,
-                        children: [
-                          Container(
-                            width: isMobile ? size.width * 0.38 : 310,
-                            height: 60,
-                            padding: const EdgeInsets.symmetric(horizontal: 14),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[600],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: dificuldade,
-                                dropdownColor: Colors.grey[700],
-                                icon: const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.white,
-                                ),
-                                isExpanded: true,
-                                items: const [
-                                  DropdownMenuItem(
-                                    value: '1',
-                                    child: Text('Fácil'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: '2',
-                                    child: Text('Médio'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: '3',
-                                    child: Text('Difícil'),
-                                  ),
-                                ],
-                                onChanged: (value) =>
-                                    setState(() => dificuldade = value),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: isMobile ? 17 : 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Pergunta:',
+                              hintStyle: TextStyle(
+                                color: Colors.white70,
+                                fontSize: isMobile ? 22 : 26,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
+                        ),
 
+                        const SizedBox(height: 12),
+
+                        Container(
+                          width: double.infinity,
+                          height: isMobile ? 65 : 72,
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[500],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: TextField(
+                            controller: dicaController,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 18 : 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Dica:',
+                              hintStyle: TextStyle(
+                                color: Colors.white70,
+                                fontSize: isMobile ? 20 : 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: isMobile ? 14 : 40,
+                          runSpacing: 14,
+                          children: [
+                            Container(
+                              width: isMobile ? size.width * 0.38 : 310,
+                              height: 60,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[600],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: dificuldade,
+                                  dropdownColor: Colors.grey[700],
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_down,
+                                    color: Colors.white,
+                                  ),
+                                  isExpanded: true,
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: '1',
+                                      child: Text('Fácil'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: '2',
+                                      child: Text('Médio'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: '3',
+                                      child: Text('Difícil'),
+                                    ),
+                                  ],
+                                  onChanged: (value) =>
+                                      setState(() => dificuldade = value),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: isMobile ? 17 : 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(
+                              width: isMobile ? size.width * 0.38 : 310,
+                              height: 60,
+                              child: ElevatedButton(
+                                onPressed: escolherImagem,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.grey[600],
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Imagem',
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 18 : 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Icon(Icons.add, size: isMobile ? 28 : 34),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        if (caminhoImagem != null &&
+                            caminhoImagem!.isNotEmpty) ...[
+                          const SizedBox(height: 20),
+                          imagemPreview(isMobile: isMobile),
+                          const SizedBox(height: 18),
                           SizedBox(
-                            width: isMobile ? size.width * 0.38 : 310,
-                            height: 60,
-                            child: ElevatedButton(
-                              onPressed: escolherImagem,
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton.icon(
+                              onPressed: () =>
+                                  setState(() => caminhoImagem = null),
+                              icon: const Icon(Icons.delete_outline),
+                              label: const Text(
+                                'Desanexar imagem',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.grey[600],
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Imagem',
-                                    style: TextStyle(
-                                      fontSize: isMobile ? 18 : 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Icon(Icons.add, size: isMobile ? 28 : 34),
-                                ],
                               ),
                             ),
                           ),
                         ],
-                      ),
 
-                      if (caminhoImagem != null &&
-                          caminhoImagem!.isNotEmpty) ...[
-                        const SizedBox(height: 20),
-                        imagemPreview(isMobile: isMobile),
                         const SizedBox(height: 18),
+
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Alternativas:',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Wrap(
+                          spacing: 18,
+                          runSpacing: 14,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            campoAlternativa('A', alternativaAController),
+                            campoAlternativa('B', alternativaBController),
+                            campoAlternativa('C', alternativaCController),
+                            campoAlternativa('D', alternativaDController),
+                          ],
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Resposta correta:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Wrap(
+                          spacing: 18,
+                          runSpacing: 12,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            caixaCorreta('A'),
+                            caixaCorreta('B'),
+                            caixaCorreta('C'),
+                            caixaCorreta('D'),
+                          ],
+                        ),
+
+                        const SizedBox(height: 24),
+
                         SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton.icon(
-                            onPressed: () =>
-                                setState(() => caminhoImagem = null),
-                            icon: const Icon(Icons.delete_outline),
-                            label: const Text(
-                              'Desanexar imagem',
+                          width: isMobile ? size.width * 0.65 : 265,
+                          height: 62,
+                          child: ElevatedButton(
+                            onPressed: salvarEdicao,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFB71C1C),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: const Text(
+                              'SALVAR',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 23,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        SizedBox(
+                          width: isMobile ? size.width * 0.65 : 265,
+                          height: 54,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey[600],
+                              backgroundColor: Colors.grey[700],
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Voltar',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
                               ),
                             ),
                           ),
                         ),
+
+                        const SizedBox(height: 24),
                       ],
-
-                      const SizedBox(height: 18),
-
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Alternativas:',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      Wrap(
-                        spacing: 18,
-                        runSpacing: 14,
-                        alignment: WrapAlignment.center,
-                        children: [
-                          campoAlternativa('A', alternativaAController),
-                          campoAlternativa('B', alternativaBController),
-                          campoAlternativa('C', alternativaCController),
-                          campoAlternativa('D', alternativaDController),
-                        ],
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Resposta correta:',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      Wrap(
-                        spacing: 18,
-                        runSpacing: 12,
-                        alignment: WrapAlignment.center,
-                        children: [
-                          caixaCorreta('A'),
-                          caixaCorreta('B'),
-                          caixaCorreta('C'),
-                          caixaCorreta('D'),
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      SizedBox(
-                        width: isMobile ? size.width * 0.65 : 265,
-                        height: 62,
-                        child: ElevatedButton(
-                          onPressed: salvarEdicao,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFB71C1C),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: const Text(
-                            'SALVAR',
-                            style: TextStyle(
-                              fontSize: 23,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      SizedBox(
-                        width: isMobile ? size.width * 0.65 : 265,
-                        height: 54,
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[700],
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Voltar',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
