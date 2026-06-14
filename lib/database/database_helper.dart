@@ -1,8 +1,22 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 class DatabaseHelper {
   static Database? _db;
+
+  static String gerarHashSenha(String senha) {
+    final bytes = utf8.encode(senha);
+    final hash = sha256.convert(bytes).toString();
+
+    return hash;
+  }
+
+  static bool senhaJaEstaComHash(String senha) {
+    final regex = RegExp(r'^[a-f0-9]{64}$');
+    return regex.hasMatch(senha);
+  }
 
   static Future<Database> getDatabase() async {
     if (_db != null) return _db!;
@@ -12,7 +26,7 @@ class DatabaseHelper {
 
     _db = await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
@@ -20,9 +34,31 @@ class DatabaseHelper {
         await _createTables(db);
         await _insertInitialData(db);
       },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await _migrarSenhasParaHash(db);
+        }
+      },
     );
-
     return _db!;
+  }
+
+  static Future<void> _migrarSenhasParaHash(Database db) async {
+    final usuarios = await db.query('usuarios', columns: ['id', 'senha_hash']);
+
+    for (final usuario in usuarios) {
+      final id = usuario['id'] as int;
+      final senhaAtual = usuario['senha_hash']?.toString() ?? '';
+
+      if (!senhaJaEstaComHash(senhaAtual)) {
+        await db.update(
+          'usuarios',
+          {'senha_hash': gerarHashSenha(senhaAtual)},
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+      }
+    }
   }
 
   static Future<void> _createTables(Database db) async {
@@ -166,7 +202,7 @@ class DatabaseHelper {
     await db.insert('usuarios', {
       'nome': 'Professor Admin',
       'email': 'professor@cps.sp.gov.br',
-      'senha_hash': '123456',
+      'senha_hash': gerarHashSenha('123456'),
       'tipo': 'professor',
     });
 
@@ -199,7 +235,7 @@ class DatabaseHelper {
     final resultado = await db.query(
       'usuarios',
       where: 'email = ? AND senha_hash = ? AND ativo = 1',
-      whereArgs: [email, senha],
+      whereArgs: [email, gerarHashSenha(senha)],
     );
 
     return resultado.isNotEmpty;
@@ -226,7 +262,7 @@ class DatabaseHelper {
       await db.insert('usuarios', {
         'nome': nome,
         'email': email,
-        'senha_hash': senha,
+        'senha_hash': gerarHashSenha(senha),
         'tipo': tipo,
         'ativo': 1,
       });
@@ -244,7 +280,7 @@ class DatabaseHelper {
       'usuarios',
       columns: ['tipo'],
       where: 'email = ? AND senha_hash = ? AND ativo = 1',
-      whereArgs: [email, senha],
+      whereArgs: [email, gerarHashSenha(senha)],
       limit: 1,
     );
 
@@ -252,24 +288,25 @@ class DatabaseHelper {
 
     return resultado.first['tipo'] as String;
   }
+
   static Future<Map<String, dynamic>?> buscarUsuario(
-  String email,
-  String senha,
-) async {
-  final db = await getDatabase();
+    String email,
+    String senha,
+  ) async {
+    final db = await getDatabase();
 
-  final resultado = await db.query(
-    'usuarios',
-    columns: ['id', 'nome', 'email', 'tipo'],
-    where: 'email = ? AND senha_hash = ? AND ativo = 1',
-    whereArgs: [email, senha],
-    limit: 1,
-  );
+    final resultado = await db.query(
+      'usuarios',
+      columns: ['id', 'nome', 'email', 'tipo'],
+      where: 'email = ? AND senha_hash = ? AND ativo = 1',
+      whereArgs: [email, gerarHashSenha(senha)],
+      limit: 1,
+    );
 
-  if (resultado.isEmpty) return null;
+    if (resultado.isEmpty) return null;
 
-  return resultado.first;
-}
+    return resultado.first;
+  }
 
   static Future<bool> salvarPerguntas({
     required String enunciado,
@@ -365,7 +402,11 @@ class DatabaseHelper {
 
       final linhasAfetadas = await db.update(
         'usuarios',
-        {'email': novoEmail, 'senha_hash': novaSenha, 'tipo': tipo},
+        {
+          'email': novoEmail,
+          'senha_hash': gerarHashSenha(novaSenha),
+          'tipo': tipo,
+        },
         where: 'email = ?',
         whereArgs: [emailAtual],
       );
@@ -584,109 +625,113 @@ class DatabaseHelper {
 
     return resultado;
   }
-  static Future<List<Map<String, dynamic>>> pesquisarUsuarios(String termo) async {
-  final db = await getDatabase();
 
-  final todos = await db.query(
-    'usuarios',
-    where: 'ativo = 1',
-    orderBy: 'id DESC',
-  );
+  static Future<List<Map<String, dynamic>>> pesquisarUsuarios(
+    String termo,
+  ) async {
+    final db = await getDatabase();
 
-  if (termo.trim().isEmpty) {
-    return todos;
-  }
+    final todos = await db.query(
+      'usuarios',
+      where: 'ativo = 1',
+      orderBy: 'id DESC',
+    );
 
-  String normalizar(String texto) {
-    return texto
-        .toLowerCase()
-        .replaceAll('á', 'a')
-        .replaceAll('à', 'a')
-        .replaceAll('ã', 'a')
-        .replaceAll('â', 'a')
-        .replaceAll('é', 'e')
-        .replaceAll('ê', 'e')
-        .replaceAll('í', 'i')
-        .replaceAll('ó', 'o')
-        .replaceAll('ô', 'o')
-        .replaceAll('õ', 'o')
-        .replaceAll('ú', 'u')
-        .replaceAll('ç', 'c');
-  }
-
-  final termoNormalizado = normalizar(termo);
-
-  return todos.where((usuario) {
-    final nome = normalizar(usuario['nome']?.toString() ?? '');
-    final email = normalizar(usuario['email']?.toString() ?? '');
-
-    return nome.contains(termoNormalizado) ||
-        email.contains(termoNormalizado);
-  }).toList();
-}
-
-static Future<Map<String, dynamic>?> buscarUsuarioPorId(int usuarioId) async {
-  final db = await getDatabase();
-
-  final resultado = await db.query(
-    'usuarios',
-    columns: ['id', 'nome', 'email', 'tipo', 'ativo'],
-    where: 'id = ? AND ativo = 1',
-    whereArgs: [usuarioId],
-    limit: 1,
-  );
-
-  if (resultado.isEmpty) return null;
-
-  return resultado.first;
-}
-
-static Future<bool> atualizarUsuarioPorId({
-  required int usuarioId,
-  required String nome,
-  required String email,
-  String? senha,
-  required String tipoUsuario,
-}) async {
-  final db = await getDatabase();
-
-  try {
-    final dados = <String, dynamic>{
-      'nome': nome,
-      'email': email,
-      'tipo': tipoUsuario,
-    };
-
-    if (senha != null && senha.isNotEmpty) {
-      dados['senha_hash'] = senha;
+    if (termo.trim().isEmpty) {
+      return todos;
     }
 
-    final linhasAfetadas = await db.update(
+    String normalizar(String texto) {
+      return texto
+          .toLowerCase()
+          .replaceAll('á', 'a')
+          .replaceAll('à', 'a')
+          .replaceAll('ã', 'a')
+          .replaceAll('â', 'a')
+          .replaceAll('é', 'e')
+          .replaceAll('ê', 'e')
+          .replaceAll('í', 'i')
+          .replaceAll('ó', 'o')
+          .replaceAll('ô', 'o')
+          .replaceAll('õ', 'o')
+          .replaceAll('ú', 'u')
+          .replaceAll('ç', 'c');
+    }
+
+    final termoNormalizado = normalizar(termo);
+
+    return todos.where((usuario) {
+      final nome = normalizar(usuario['nome']?.toString() ?? '');
+      final email = normalizar(usuario['email']?.toString() ?? '');
+
+      return nome.contains(termoNormalizado) ||
+          email.contains(termoNormalizado);
+    }).toList();
+  }
+
+  static Future<Map<String, dynamic>?> buscarUsuarioPorId(int usuarioId) async {
+    final db = await getDatabase();
+
+    final resultado = await db.query(
       'usuarios',
-      dados,
-      where: 'id = ?',
+      columns: ['id', 'nome', 'email', 'tipo', 'ativo'],
+      where: 'id = ? AND ativo = 1',
       whereArgs: [usuarioId],
+      limit: 1,
     );
 
-    return linhasAfetadas > 0;
-  } catch (e) {
-    return false;
-  }
-}
-static Future<bool> excluirUsuario(int usuarioId) async {
-  final db = await getDatabase();
+    if (resultado.isEmpty) return null;
 
-  try {
-    final linhasAfetadas = await db.update(
-      'usuarios',
-      {'ativo': 0},
-      where: 'id = ?',
-      whereArgs: [usuarioId],
-    );
-
-    return linhasAfetadas > 0;
-  } catch (e) {
-    return false;
+    return resultado.first;
   }
-}
+
+  static Future<bool> atualizarUsuarioPorId({
+    required int usuarioId,
+    required String nome,
+    required String email,
+    String? senha,
+    required String tipoUsuario,
+  }) async {
+    final db = await getDatabase();
+
+    try {
+      final dados = <String, dynamic>{
+        'nome': nome,
+        'email': email,
+        'tipo': tipoUsuario,
+      };
+
+      if (senha != null && senha.isNotEmpty) {
+        dados['senha_hash'] = gerarHashSenha(senha);
+      }
+
+      final linhasAfetadas = await db.update(
+        'usuarios',
+        dados,
+        where: 'id = ?',
+        whereArgs: [usuarioId],
+      );
+
+      return linhasAfetadas > 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> excluirUsuario(int usuarioId) async {
+    final db = await getDatabase();
+
+    try {
+      final linhasAfetadas = await db.update(
+        'usuarios',
+        {'ativo': 0},
+        where: 'id = ?',
+        whereArgs: [usuarioId],
+      );
+
+      return linhasAfetadas > 0;
+    } catch (e) {
+      return false;
+    }
+  }
 }
