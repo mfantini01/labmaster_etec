@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class TelaEditarUsuarios extends StatefulWidget {
   const TelaEditarUsuarios({super.key});
@@ -111,231 +113,281 @@ class _TelaEditarUsuariosState extends State<TelaEditarUsuarios> {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 700;
 
+    final auth = Provider.of<AuthProvider>(context, listen: false);
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/fundo_login.png',
-              fit: BoxFit.cover,
+      backgroundColor: Colors.white,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/fundo_login.png'),
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+          ),
+        ),
+        child: Stack(
+          children: [
+            if (!isMobile) logoLabMasterDesktop(),
+
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(child: logoSuperior(isMobile: isMobile)),
             ),
-          ),
 
-          if (!isMobile) logoLabMasterDesktop(),
-
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(child: logoSuperior(isMobile: isMobile)),
-          ),
-
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                isMobile ? 22 : 24,
-                isMobile ? 120 : 105,
-                isMobile ? 22 : 24,
-                30,
-              ),
-              child: Center(
-                child: SizedBox(
-                  width: isMobile ? double.infinity : 700,
-                  child: Column(
-                    children: [
-                      Text(
-                        'Editar Usuários',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: isMobile ? 30 : 34,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFFB71C1C),
-                        ),
-                      ),
-
-                      const SizedBox(height: 28),
-
-                      Container(
-                        width: double.infinity,
-                        height: 70,
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[600],
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: TextField(
-                          controller: pesquisaController,
-                          onChanged: pesquisar,
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  isMobile ? 22 : 24,
+                  isMobile ? 120 : 105,
+                  isMobile ? 22 : 24,
+                  30,
+                ),
+                child: Center(
+                  child: SizedBox(
+                    width: isMobile ? double.infinity : 700,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Editar Usuários',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white,
-                            fontSize: isMobile ? 19 : 22,
+                            fontSize: isMobile ? 30 : 34,
                             fontWeight: FontWeight.bold,
+                            color: const Color(0xFFB71C1C),
                           ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            icon: const Icon(
-                              Icons.search,
+                        ),
+
+                        const SizedBox(height: 28),
+
+                        Container(
+                          width: double.infinity,
+                          height: 70,
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[600],
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: TextField(
+                            controller: pesquisaController,
+                            onChanged: pesquisar,
+                            style: TextStyle(
                               color: Colors.white,
-                              size: 30,
-                            ),
-                            hintText: isMobile
-                                ? 'Digite o nome do usu...'
-                                : 'Digite o nome do usuário',
-                            hintStyle: TextStyle(
-                              color: Colors.white70,
                               fontSize: isMobile ? 19 : 22,
                               fontWeight: FontWeight.bold,
                             ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 25),
-
-                      if (usuarios.isEmpty)
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(22),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.75),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: const Text(
-                            'Nenhum usuário encontrado',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              icon: const Icon(
+                                Icons.search,
+                                color: Colors.white,
+                                size: 30,
+                              ),
+                              hintText: isMobile
+                                  ? 'Digite o nome do usu...'
+                                  : 'Digite o nome do usuário',
+                              hintStyle: TextStyle(
+                                color: Colors.white70,
+                                fontSize: isMobile ? 19 : 22,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        )
-                      else
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: usuarios.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 14),
-                          itemBuilder: (context, index) {
-                            final usuario = usuarios[index];
+                        ),
 
-                            return InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        TelaFormularioEditarUsuarios(
-                                          usuarioId: usuario['id'],
-                                        ),
-                                  ),
-                                ).then(
-                                  (_) => pesquisar(pesquisaController.text),
-                                );
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(18),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.8),
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: Colors.grey.shade300,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.person,
-                                      color: Color(0xFFB71C1C),
-                                      size: 32,
-                                    ),
-                                    const SizedBox(width: 14),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            usuario['nome'] ?? '',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: isMobile ? 18 : 20,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black87,
-                                            ),
+                        const SizedBox(height: 25),
+
+                        if (usuarios.isEmpty)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(22),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.75),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Text(
+                              'Nenhum usuário encontrado',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          )
+                        else
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: usuarios.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 14),
+                            itemBuilder: (context, index) {
+                              final usuario = usuarios[index];
+                              final usuarioLogado =
+                                  usuario['id'] == auth.usuarioId;
+
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          TelaFormularioEditarUsuarios(
+                                            usuarioId: usuario['id'],
                                           ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            usuario['email'] ?? '',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: isMobile ? 14 : 16,
-                                              color: Colors.black54,
+                                    ),
+                                  ).then(
+                                    (_) => pesquisar(pesquisaController.text),
+                                  );
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.8),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.person,
+                                        color: Color(0xFFB71C1C),
+                                        size: 32,
+                                      ),
+                                      const SizedBox(width: 14),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    usuario['nome'] ?? '',
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: isMobile
+                                                          ? 18
+                                                          : 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black87,
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                if (usuarioLogado)
+                                                  Container(
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                          left: 8,
+                                                        ),
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 3,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.green,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            12,
+                                                          ),
+                                                    ),
+                                                    child: const Text(
+                                                      'VOCÊ',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
                                             ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              usuario['email'] ?? '',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: isMobile ? 14 : 16,
+                                                color: Colors.black54,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (!usuarioLogado)
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.delete,
+                                                color: Colors.red,
+                                              ),
+                                              onPressed: () {
+                                                confirmarExclusao(
+                                                  usuario['id'],
+                                                );
+                                              },
+                                            ),
+                                          const Icon(
+                                            Icons.arrow_forward_ios,
+                                            size: 20,
+                                            color: Colors.black54,
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.delete,
-                                            color: Colors.red,
-                                          ),
-                                          onPressed: () {
-                                            confirmarExclusao(usuario['id']);
-                                          },
-                                        ),
-                                        const Icon(
-                                          Icons.arrow_forward_ios,
-                                          size: 20,
-                                          color: Colors.black54,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
+                              );
+                            },
+                          ),
+
+                        const SizedBox(height: 26),
+
+                        SizedBox(
+                          width: isMobile ? size.width * 0.65 : 265,
+                          height: 54,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey[700],
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                            );
-                          },
-                        ),
-
-                      const SizedBox(height: 26),
-
-                      SizedBox(
-                        width: isMobile ? size.width * 0.65 : 265,
-                        height: 54,
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[700],
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
                             ),
-                          ),
-                          child: const Text(
-                            'Voltar',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17,
+                            child: const Text(
+                              'Voltar',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -512,173 +564,179 @@ class _TelaFormularioEditarUsuariosState
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/fundo_login.png',
-              fit: BoxFit.cover,
+      backgroundColor: Colors.white,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/fundo_login.png'),
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+          ),
+        ),
+        child: Stack(
+          children: [
+            if (!isMobile) logoLabMasterDesktop(),
+
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(child: logoSuperior(isMobile: isMobile)),
             ),
-          ),
 
-          if (!isMobile) logoLabMasterDesktop(),
-
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(child: logoSuperior(isMobile: isMobile)),
-          ),
-
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                isMobile ? 22 : 24,
-                isMobile ? 120 : 105,
-                isMobile ? 22 : 24,
-                30,
-              ),
-              child: Center(
-                child: SizedBox(
-                  width: isMobile ? double.infinity : 680,
-                  child: Column(
-                    children: [
-                      Text(
-                        'Editar Usuário',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: isMobile ? 30 : 34,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFFB71C1C),
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  isMobile ? 22 : 24,
+                  isMobile ? 120 : 105,
+                  isMobile ? 22 : 24,
+                  30,
+                ),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: SizedBox(
+                    width: isMobile ? double.infinity : 680,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Editar Usuário',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: isMobile ? 30 : 34,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFFB71C1C),
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 28),
+                        const SizedBox(height: 28),
 
-                      campoTexto(
-                        controller: nomeController,
-                        hint: 'Nome:',
-                        icon: Icons.person,
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      campoTexto(
-                        controller: emailController,
-                        hint: 'E-mail:',
-                        icon: Icons.email,
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      campoTexto(
-                        controller: senhaController,
-                        hint: 'Nova senha, opcional:',
-                        icon: Icons.lock,
-                        obscureText: true,
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      Container(
-                        width: double.infinity,
-                        height: 70,
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[600],
-                          borderRadius: BorderRadius.circular(14),
+                        campoTexto(
+                          controller: nomeController,
+                          hint: 'Nome:',
+                          icon: Icons.person,
                         ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: tipoUsuario,
-                            dropdownColor: Colors.grey[700],
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Colors.white,
-                            ),
-                            isExpanded: true,
-                            hint: const Text(
-                              'Tipo de usuário',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'professor',
-                                child: Text('Professor'),
+
+                        const SizedBox(height: 14),
+
+                        campoTexto(
+                          controller: emailController,
+                          hint: 'E-mail:',
+                          icon: Icons.email,
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        campoTexto(
+                          controller: senhaController,
+                          hint: 'Nova senha, opcional:',
+                          icon: Icons.lock,
+                          obscureText: true,
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        Container(
+                          width: double.infinity,
+                          height: 70,
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[600],
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: tipoUsuario,
+                              dropdownColor: Colors.grey[700],
+                              icon: const Icon(
+                                Icons.keyboard_arrow_down,
+                                color: Colors.white,
                               ),
-                              DropdownMenuItem(
-                                value: 'aluno',
-                                child: Text('Aluno'),
+                              isExpanded: true,
+                              hint: const Text(
+                                'Tipo de usuário',
+                                style: TextStyle(color: Colors.white70),
                               ),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                tipoUsuario = value;
-                              });
-                            },
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: isMobile ? 19 : 22,
-                              fontWeight: FontWeight.bold,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'professor',
+                                  child: Text('Professor'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'aluno',
+                                  child: Text('Aluno'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  tipoUsuario = value;
+                                });
+                              },
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: isMobile ? 19 : 22,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                      ),
 
-                      const SizedBox(height: 26),
+                        const SizedBox(height: 26),
 
-                      SizedBox(
-                        width: isMobile ? size.width * 0.65 : 265,
-                        height: 62,
-                        child: ElevatedButton(
-                          onPressed: salvarEdicao,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFB71C1C),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                        SizedBox(
+                          width: isMobile ? size.width * 0.65 : 265,
+                          height: 62,
+                          child: ElevatedButton(
+                            onPressed: salvarEdicao,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFB71C1C),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
-                          ),
-                          child: const Text(
-                            'SALVAR',
-                            style: TextStyle(
-                              fontSize: 23,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      SizedBox(
-                        width: isMobile ? size.width * 0.65 : 265,
-                        height: 54,
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[700],
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Voltar',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17,
+                            child: const Text(
+                              'SALVAR',
+                              style: TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+
+                        const SizedBox(height: 14),
+
+                        SizedBox(
+                          width: isMobile ? size.width * 0.65 : 265,
+                          height: 54,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey[700],
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Voltar',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

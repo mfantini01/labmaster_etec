@@ -8,8 +8,7 @@ class TelaAdicionarPerguntas extends StatefulWidget {
   const TelaAdicionarPerguntas({super.key});
 
   @override
-  State<TelaAdicionarPerguntas> createState() =>
-      _TelaAdicionarPerguntasState();
+  State<TelaAdicionarPerguntas> createState() => _TelaAdicionarPerguntasState();
 }
 
 class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
@@ -39,38 +38,38 @@ class _TelaAdicionarPerguntasState extends State<TelaAdicionarPerguntas> {
     super.dispose();
   }
 
-Future<void> escolherImagem() async {
-  final resultado = await FilePicker.pickFiles(type: FileType.image);
+  Future<void> escolherImagem() async {
+    final resultado = await FilePicker.pickFiles(type: FileType.image);
 
-  if (resultado != null && resultado.files.first.path != null) {
-    setState(() {
-      caminhoImagem = resultado.files.first.path!;
-    });
+    if (resultado != null && resultado.files.first.path != null) {
+      setState(() {
+        caminhoImagem = resultado.files.first.path!;
+      });
+    }
   }
-}
 
-Future<void> escolherImagemAlternativa(String letra) async {
-  final resultado = await FilePicker.pickFiles(type: FileType.image);
+  Future<void> escolherImagemAlternativa(String letra) async {
+    final resultado = await FilePicker.pickFiles(type: FileType.image);
 
-  if (resultado != null && resultado.files.first.path != null) {
-    setState(() {
-      switch (letra) {
-        case 'A':
-          imagemAlternativaA = resultado.files.first.path!;
-          break;
-        case 'B':
-          imagemAlternativaB = resultado.files.first.path!;
-          break;
-        case 'C':
-          imagemAlternativaC = resultado.files.first.path!;
-          break;
-        case 'D':
-          imagemAlternativaD = resultado.files.first.path!;
-          break;
-      }
-    });
+    if (resultado != null && resultado.files.first.path != null) {
+      setState(() {
+        switch (letra) {
+          case 'A':
+            imagemAlternativaA = resultado.files.first.path!;
+            break;
+          case 'B':
+            imagemAlternativaB = resultado.files.first.path!;
+            break;
+          case 'C':
+            imagemAlternativaC = resultado.files.first.path!;
+            break;
+          case 'D':
+            imagemAlternativaD = resultado.files.first.path!;
+            break;
+        }
+      });
+    }
   }
-}
 
   Future<void> confirmarPerguntas() async {
     final enunciado = perguntaController.text.trim();
@@ -88,9 +87,9 @@ Future<void> escolherImagemAlternativa(String letra) async {
         (alternativaC.isEmpty && imagemAlternativaC == null) ||
         (alternativaD.isEmpty && imagemAlternativaD == null) ||
         alternativaCorreta == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha todos os campos')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Preencha todos os campos')));
       return;
     }
 
@@ -118,9 +117,9 @@ Future<void> escolherImagemAlternativa(String letra) async {
       );
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao salvar pergunta')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Erro ao salvar pergunta')));
     }
   }
 
@@ -292,18 +291,16 @@ Future<void> escolherImagemAlternativa(String letra) async {
         right: isMobile ? 18 : 30,
       ),
       child: Row(
-        mainAxisAlignment:
-            isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+        mainAxisAlignment: isMobile
+            ? MainAxisAlignment.spaceBetween
+            : MainAxisAlignment.start,
         children: [
           Image.asset(
             'assets/images/logo_cps_semfundo.png',
             width: isMobile ? 70 : 115,
           ),
           if (isMobile)
-            Image.asset(
-              'assets/images/logo_labmaster.png',
-              width: 95,
-            ),
+            Image.asset('assets/images/logo_labmaster.png', width: 95),
         ],
       ),
     );
@@ -313,10 +310,7 @@ Future<void> escolherImagemAlternativa(String letra) async {
     return Positioned(
       top: 30,
       right: 30,
-      child: Image.asset(
-        'assets/images/logo_labmaster.png',
-        width: 180,
-      ),
+      child: Image.asset('assets/images/logo_labmaster.png', width: 180),
     );
   }
 
@@ -326,342 +320,346 @@ Future<void> escolherImagemAlternativa(String letra) async {
     final isMobile = size.width < 700;
 
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/fundo_login.png',
-              fit: BoxFit.cover,
-            ),
+      backgroundColor: Colors.white,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/fundo_login.png'),
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
           ),
+        ),
+        child: Stack(
+          children: [
+            if (!isMobile) logoLabMasterDesktop(),
 
-          if (!isMobile) logoLabMasterDesktop(),
-
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: logoSuperior(isMobile: isMobile),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(child: logoSuperior(isMobile: isMobile)),
             ),
-          ),
 
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                isMobile ? 22 : 24,
-                isMobile ? 105 : 90,
-                isMobile ? 22 : 24,
-                30,
-              ),
-              child: Center(
-                child: SizedBox(
-                  width: isMobile ? double.infinity : 680,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        height: isMobile ? 92 : 105,
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[600],
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: TextField(
-                          controller: perguntaController,
-                          maxLines: null,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: isMobile ? 20 : 24,
-                            fontWeight: FontWeight.bold,
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  isMobile ? 22 : 24,
+                  isMobile ? 105 : 90,
+                  isMobile ? 22 : 24,
+                  30,
+                ),
+                child: Center(
+                  child: SizedBox(
+                    width: isMobile ? double.infinity : 680,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: isMobile ? 92 : 105,
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[600],
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Pergunta:',
-                            hintStyle: TextStyle(
-                              color: Colors.white70,
-                              fontSize: isMobile ? 22 : 26,
+                          child: TextField(
+                            controller: perguntaController,
+                            maxLines: null,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 20 : 24,
                               fontWeight: FontWeight.bold,
                             ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      Container(
-                        width: double.infinity,
-                        height: isMobile ? 65 : 72,
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[500],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: TextField(
-                          controller: dicaController,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: isMobile ? 18 : 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Dica:',
-                            hintStyle: TextStyle(
-                              color: Colors.white70,
-                              fontSize: isMobile ? 20 : 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: isMobile ? 14 : 40,
-                        runSpacing: 14,
-                        children: [
-                          Container(
-                            width: isMobile ? size.width * 0.38 : 310,
-                            height: 60,
-                            padding: const EdgeInsets.symmetric(horizontal: 14),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[600],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: dificuldade,
-                                hint: Text(
-                                  'Dificuldade',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: isMobile ? 18 : 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                dropdownColor: Colors.grey[700],
-                                icon: const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.white,
-                                ),
-                                isExpanded: true,
-                                items: const [
-                                  DropdownMenuItem(
-                                    value: '1',
-                                    child: Text('Fácil'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: '2',
-                                    child: Text('Médio'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: '3',
-                                    child: Text('Difícil'),
-                                  ),
-                                ],
-                                onChanged: (value) =>
-                                    setState(() => dificuldade = value),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: isMobile ? 17 : 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Pergunta:',
+                              hintStyle: TextStyle(
+                                color: Colors.white70,
+                                fontSize: isMobile ? 22 : 26,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
+                        ),
 
-                          SizedBox(
-                            width: isMobile ? size.width * 0.38 : 310,
-                            height: 60,
-                            child: ElevatedButton(
-                              onPressed: escolherImagem,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.grey[600],
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                        const SizedBox(height: 12),
+
+                        Container(
+                          width: double.infinity,
+                          height: isMobile ? 65 : 72,
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[500],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: TextField(
+                            controller: dicaController,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 18 : 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Dica:',
+                              hintStyle: TextStyle(
+                                color: Colors.white70,
+                                fontSize: isMobile ? 20 : 22,
+                                fontWeight: FontWeight.bold,
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Imagem',
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: isMobile ? 14 : 40,
+                          runSpacing: 14,
+                          children: [
+                            Container(
+                              width: isMobile ? size.width * 0.38 : 310,
+                              height: 60,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[600],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: dificuldade,
+                                  hint: Text(
+                                    'Dificuldade',
                                     style: TextStyle(
+                                      color: Colors.white,
                                       fontSize: isMobile ? 18 : 22,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Icon(Icons.add, size: isMobile ? 28 : 34),
-                                ],
+                                  dropdownColor: Colors.grey[700],
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_down,
+                                    color: Colors.white,
+                                  ),
+                                  isExpanded: true,
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: '1',
+                                      child: Text('Fácil'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: '2',
+                                      child: Text('Médio'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: '3',
+                                      child: Text('Difícil'),
+                                    ),
+                                  ],
+                                  onChanged: (value) =>
+                                      setState(() => dificuldade = value),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: isMobile ? 17 : 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(
+                              width: isMobile ? size.width * 0.38 : 310,
+                              height: 60,
+                              child: ElevatedButton(
+                                onPressed: escolherImagem,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.grey[600],
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Imagem',
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 18 : 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Icon(Icons.add, size: isMobile ? 28 : 34),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        if (caminhoImagem != null) ...[
+                          const SizedBox(height: 20),
+                          Container(
+                            width: double.infinity,
+                            height: isMobile ? 180 : 230,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.45),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: Colors.grey.shade400,
+                                width: 2,
+                              ),
+                            ),
+                            child: Image.file(
+                              File(caminhoImagem!),
+                              fit: BoxFit.scaleDown,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton.icon(
+                              onPressed: () =>
+                                  setState(() => caminhoImagem = null),
+                              icon: const Icon(Icons.delete_outline),
+                              label: const Text(
+                                'Desanexar imagem',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey[600],
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
                             ),
                           ),
                         ],
-                      ),
 
-                      if (caminhoImagem != null) ...[
-                        const SizedBox(height: 20),
-                        Container(
-                          width: double.infinity,
-                          height: isMobile ? 180 : 230,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.45),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: Colors.grey.shade400,
-                              width: 2,
+                        const SizedBox(height: 18),
+
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Alternativas:',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
                             ),
                           ),
-                          child: Image.file(
-                            File(caminhoImagem!),
-                            fit: BoxFit.scaleDown,
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Wrap(
+                          spacing: 18,
+                          runSpacing: 14,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            campoAlternativa('A', alternativaAController),
+                            campoAlternativa('B', alternativaBController),
+                            campoAlternativa('C', alternativaCController),
+                            campoAlternativa('D', alternativaDController),
+                          ],
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Resposta correta:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 18),
+
+                        const SizedBox(height: 10),
+
+                        Wrap(
+                          spacing: 18,
+                          runSpacing: 12,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            caixaCorreta('A'),
+                            caixaCorreta('B'),
+                            caixaCorreta('C'),
+                            caixaCorreta('D'),
+                          ],
+                        ),
+
+                        const SizedBox(height: 24),
+
                         SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton.icon(
-                            onPressed: () =>
-                                setState(() => caminhoImagem = null),
-                            icon: const Icon(Icons.delete_outline),
-                            label: const Text(
-                              'Desanexar imagem',
+                          width: isMobile ? size.width * 0.65 : 265,
+                          height: 62,
+                          child: ElevatedButton(
+                            onPressed: confirmarPerguntas,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFB71C1C),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: const Text(
+                              'CONFIRMAR',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 23,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        SizedBox(
+                          width: isMobile ? size.width * 0.65 : 265,
+                          height: 54,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey[600],
+                              backgroundColor: Colors.grey[700],
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Voltar',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
                               ),
                             ),
                           ),
                         ),
+
+                        const SizedBox(height: 24),
                       ],
-
-                      const SizedBox(height: 18),
-
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Alternativas:',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      Wrap(
-                        spacing: 18,
-                        runSpacing: 14,
-                        alignment: WrapAlignment.center,
-                        children: [
-                          campoAlternativa('A', alternativaAController),
-                          campoAlternativa('B', alternativaBController),
-                          campoAlternativa('C', alternativaCController),
-                          campoAlternativa('D', alternativaDController),
-                        ],
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Resposta correta:',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      Wrap(
-                        spacing: 18,
-                        runSpacing: 12,
-                        alignment: WrapAlignment.center,
-                        children: [
-                          caixaCorreta('A'),
-                          caixaCorreta('B'),
-                          caixaCorreta('C'),
-                          caixaCorreta('D'),
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      SizedBox(
-                        width: isMobile ? size.width * 0.65 : 265,
-                        height: 62,
-                        child: ElevatedButton(
-                          onPressed: confirmarPerguntas,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFB71C1C),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: const Text(
-                            'CONFIRMAR',
-                            style: TextStyle(
-                              fontSize: 23,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      SizedBox(
-                        width: isMobile ? size.width * 0.65 : 265,
-                        height: 54,
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[700],
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Voltar',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
