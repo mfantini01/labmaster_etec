@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'tela_editar_usuarios.dart';
 import '../providers/auth_provider.dart';
 import 'tela_login.dart';
 import 'tela_perguntas.dart';
@@ -79,6 +79,19 @@ class ProfessorScreen extends StatelessWidget {
                         height: isMobile ? 65 : 80,
                         onPressed: () {
                           debugPrint('Ranking clicado');
+                        },
+                      ),
+                      _MenuButton(
+                        text: 'Editar Usuários',
+                        width: isMobile ? size.width * 0.75 : 260,
+                        height: isMobile ? 65 : 80,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TelaEditarUsuarios(),
+                            ),
+                          );
                         },
                       ),
                     ],
