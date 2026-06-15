@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import 'tela_cadastrar_usuarios.dart';
 
 class TelaEditarUsuarios extends StatefulWidget {
   const TelaEditarUsuarios({super.key});
@@ -382,6 +383,40 @@ class _TelaEditarUsuariosState extends State<TelaEditarUsuarios> {
                         ),
                       ],
                     ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 30,
+              right: 30,
+              child: SizedBox(
+                width: isMobile ? 180 : 220,
+                height: isMobile ? 50 : 55,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TelaCadastrarUsuario(),
+                      ),
+                    ).then((_) {
+                      pesquisar('');
+                    });
+                  },
+
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFB71C1C),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+
+                  icon: const Icon(Icons.person_add),
+                  label: const Text(
+                    'Adicionar Usuário',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
