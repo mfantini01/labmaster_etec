@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 
 class TelaJogo extends StatefulWidget {
-  const TelaJogo({super.key});
+  final String email;
+  final String senha;
+
+  const TelaJogo({super.key, required this.email, required this.senha});
 
   @override
   State<TelaJogo> createState() => _TelaJogoState();
@@ -170,6 +173,14 @@ class _TelaJogoState extends State<TelaJogo> {
     } else {
       desempenho = 'Precisa melhorar';
     }
+
+    DatabaseHelper.salvarPartida(
+      email: widget.email,
+      senha: widget.senha,
+      pontuacao: pontuacao,
+      acertos: acertos,
+      erros: erros,
+    );
 
     showDialog(
       context: context,

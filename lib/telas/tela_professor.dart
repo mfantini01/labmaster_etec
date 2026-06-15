@@ -4,6 +4,7 @@ import 'tela_editar_usuarios.dart';
 import '../providers/auth_provider.dart';
 import 'tela_login.dart';
 import 'tela_perguntas.dart';
+import 'tela_ranking.dart';
 
 class ProfessorScreen extends StatelessWidget {
   const ProfessorScreen({super.key});
@@ -78,7 +79,12 @@ class ProfessorScreen extends StatelessWidget {
                         width: isMobile ? size.width * 0.75 : 260,
                         height: isMobile ? 65 : 80,
                         onPressed: () {
-                          debugPrint('Ranking clicado');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TelaRanking(),
+                            ),
+                          );
                         },
                       ),
                       _MenuButton(
