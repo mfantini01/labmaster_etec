@@ -734,4 +734,51 @@ class DatabaseHelper {
       return false;
     }
   }
+
+  static Future<bool> salvarPartida({
+    required String email,
+    required String senha,
+    required int pontuacao,
+    required int acertos,
+    required int erros,
+  }) async {
+    final db = await getDatabase();
+
+    final usuario = await buscarUsuario(email, senha);
+
+    if (usuario == null) return false;
+
+    try {
+      await db.insert('partidas', {
+        'aluno_id': usuario['id'],
+        'nivel_atual': 1,
+        'pontuacao': pontuacao,
+        'acertos': acertos,
+        'erros': erros,
+        'data_fim': DateTime.now().toIso8601String(),
+      });
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> buscarRanking() async {
+    final db = await getDatabase();
+
+    return await db.rawQuery('''
+    SELECT
+      u.nome,
+      p.pontuacao,
+      p.acertos,
+      p.erros,
+      p.data_fim
+    FROM partidas p
+    INNER JOIN usuarios u ON u.id = p.aluno_id
+    WHERE u.ativo = 1
+    ORDER BY p.pontuacao DESC, p.acertos DESC
+    LIMIT 10
+  ''');
+  }
 }

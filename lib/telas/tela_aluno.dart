@@ -72,7 +72,8 @@ class TelaAluno extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const TelaJogo(),
+                              builder: (context) =>
+                                  TelaJogo(email: email, senha: senha),
                             ),
                           );
                         },
