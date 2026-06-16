@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
@@ -25,6 +26,9 @@ class _TelaJogoState extends State<TelaJogo> {
   int pontuacao = 0;
   int acertos = 0;
   int erros = 0;
+  int? alternativaSelecionada;
+  int? alternativaCorreta;
+  bool bloqueado = false;
 
   @override
   void initState() {
@@ -46,9 +50,21 @@ class _TelaJogoState extends State<TelaJogo> {
       return 4;
     }
 
-    resultado.sort((a, b) {
-      return pesoDificuldade(a).compareTo(pesoDificuldade(b));
-    });
+    final faceis = resultado.where((p) => pesoDificuldade(p) == 1).toList();
+
+    final medias = resultado.where((p) => pesoDificuldade(p) == 2).toList();
+
+    final dificeis = resultado.where((p) => pesoDificuldade(p) == 3).toList();
+
+    faceis.shuffle();
+    medias.shuffle();
+    dificeis.shuffle();
+
+    resultado
+      ..clear()
+      ..addAll(faceis)
+      ..addAll(medias)
+      ..addAll(dificeis);
 
     setState(() {
       perguntas = resultado;
@@ -57,7 +73,22 @@ class _TelaJogoState extends State<TelaJogo> {
   }
 
   void responder(Map<String, dynamic> alternativa) {
+    if (bloqueado) return;
+
     final correta = alternativa['correta'] == 1;
+
+    final alternativas =
+        perguntas[perguntaAtual]['alternativas'] as List<Map<String, dynamic>>;
+
+    final indiceSelecionado = alternativas.indexOf(alternativa);
+
+    final indiceCorreto = alternativas.indexWhere((alt) => alt['correta'] == 1);
+
+    setState(() {
+      bloqueado = true;
+      alternativaSelecionada = indiceSelecionado;
+      alternativaCorreta = indiceCorreto;
+    });
 
     if (correta) {
       pontuacao += 10;
@@ -66,25 +97,97 @@ class _TelaJogoState extends State<TelaJogo> {
       erros++;
     }
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        title: Text(correta ? 'Resposta correta!' : 'Resposta errada!'),
-        content: Text(
-          correta ? 'Você ganhou 10 pontos.' : 'Não foi dessa vez.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              proximaPergunta();
-            },
-            child: const Text('Continuar'),
-          ),
-        ],
-      ),
-    );
+    Future.delayed(const Duration(milliseconds: 800), () {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E2E),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: correta ? Colors.greenAccent : Colors.redAccent,
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: (correta ? Colors.greenAccent : Colors.redAccent)
+                        .withOpacity(0.3),
+                    blurRadius: 20,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    correta ? Icons.check_circle : Icons.cancel,
+                    color: correta ? Colors.greenAccent : Colors.redAccent,
+                    size: 60,
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  Text(
+                    correta ? 'RESPOSTA CORRETA!' : 'RESPOSTA INCORRETA!',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  Text(
+                    correta ? 'Você ganhou 10 pontos.' : 'Não foi dessa vez.',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white70, fontSize: 18),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+
+                      setState(() {
+                        alternativaSelecionada = null;
+                        alternativaCorreta = null;
+                        bloqueado = false;
+                      });
+
+                      proximaPergunta();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: correta
+                          ? Colors.greenAccent
+                          : Colors.redAccent,
+                      foregroundColor: Colors.black,
+                      minimumSize: const Size(140, 45),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'CONTINUAR',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    });
   }
 
   void proximaPergunta() {
@@ -92,9 +195,6 @@ class _TelaJogoState extends State<TelaJogo> {
       setState(() {
         perguntaAtual++;
         alternativasOcultas.clear();
-        usouDica = false;
-        usou5050 = false;
-        usouPular = false;
       });
     } else {
       mostrarFimDeJogo();
@@ -135,16 +235,66 @@ class _TelaJogoState extends State<TelaJogo> {
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Dica'),
-        content: Text(dica.isEmpty ? 'Sem dica cadastrada.' : dica),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Fechar'),
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E2E),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.redAccent, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.redAccent.withOpacity(0.3),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.lightbulb, color: Colors.amber, size: 50),
+
+                const SizedBox(height: 12),
+
+                const Text(
+                  'DICA',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                Text(
+                  dica,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white70, fontSize: 18),
+                ),
+
+                const SizedBox(height: 25),
+
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text('FECHAR'),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -163,15 +313,20 @@ class _TelaJogoState extends State<TelaJogo> {
     final porcentagem = total == 0 ? 0 : (acertos / total) * 100;
 
     String desempenho;
+    Color corDesempenho;
 
     if (porcentagem >= 80) {
-      desempenho = 'Excelente';
+      desempenho = 'EXCELENTE';
+      corDesempenho = Colors.greenAccent;
     } else if (porcentagem >= 60) {
-      desempenho = 'Bom';
+      desempenho = 'BOM';
+      corDesempenho = Colors.lightBlueAccent;
     } else if (porcentagem >= 40) {
-      desempenho = 'Regular';
+      desempenho = 'REGULAR';
+      corDesempenho = Colors.orangeAccent;
     } else {
-      desempenho = 'Precisa melhorar';
+      desempenho = 'PRECISA MELHORAR';
+      corDesempenho = Colors.redAccent;
     }
 
     DatabaseHelper.salvarPartida(
@@ -185,24 +340,103 @@ class _TelaJogoState extends State<TelaJogo> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        title: const Text('Fim de jogo!'),
-        content: Text(
-          'Acertos: $acertos/$total\n'
-          'Erros: $erros\n'
-          'Pontuação: $pontuacao pontos\n'
-          'Desempenho: $desempenho',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: const Text('Sair'),
+      builder: (_) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E2E),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.redAccent, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.redAccent.withOpacity(0.3),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.emoji_events, color: Colors.amber, size: 70),
+
+                const SizedBox(height: 15),
+
+                const Text(
+                  'FIM DE JOGO',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                Text(
+                  'Acertos: $acertos/$total',
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  'Erros: $erros',
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  'Pontuação: $pontuacao pontos',
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                ),
+
+                const SizedBox(height: 20),
+
+                const Text(
+                  'DESEMPENHO',
+                  style: TextStyle(color: Colors.white70, letterSpacing: 2),
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  desempenho,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: corDesempenho,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.home),
+                  label: const Text('VOLTAR AO MENU'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(220, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -224,6 +458,12 @@ class _TelaJogoState extends State<TelaJogo> {
     final pergunta = perguntas[perguntaAtual]['questao'];
     final alternativas =
         perguntas[perguntaAtual]['alternativas'] as List<Map<String, dynamic>>;
+    final caminhoImagem = pergunta['caminho_imagem']?.toString();
+    final possuiImagem = alternativas.any(
+      (alt) =>
+          alt['caminho_imagem_alternativa'] != null &&
+          alt['caminho_imagem_alternativa'].toString().isNotEmpty,
+    );
 
     return Scaffold(
       body: Stack(
@@ -234,15 +474,7 @@ class _TelaJogoState extends State<TelaJogo> {
               fit: BoxFit.cover,
             ),
           ),
-          Positioned(
-            top: 25,
-            left: 25,
-            child: Image.asset(
-              'assets/images/logo2_cps.png',
-              width: isMobile ? 70 : 110,
-              color: Colors.white,
-            ),
-          ),
+
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -251,6 +483,12 @@ class _TelaJogoState extends State<TelaJogo> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      Image.asset(
+                        'assets/images/logo2_cps.png',
+                        width: 90,
+                        color: Colors.white,
+                      ),
+
                       Text(
                         'Pergunta ${perguntaAtual + 1}/${perguntas.length}',
                         style: const TextStyle(
@@ -287,9 +525,29 @@ class _TelaJogoState extends State<TelaJogo> {
                       ),
                     ),
                   ),
+
+                  const SizedBox(height: 20),
+
+                  if (pergunta['caminho_imagem'] != null)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        File(pergunta['caminho_imagem']),
+                        height: 200,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+
                   const SizedBox(height: 30),
                   Expanded(
-                    child: ListView.builder(
+                    child: GridView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // 2 colunas
+                        crossAxisSpacing: 20,
+                        mainAxisSpacing: 20,
+                        childAspectRatio: possuiImagem ? 3.5 : 6,
+                      ),
                       itemCount: alternativas.length,
                       itemBuilder: (context, index) {
                         if (alternativasOcultas.contains(index)) {
@@ -298,40 +556,134 @@ class _TelaJogoState extends State<TelaJogo> {
 
                         final alternativa = alternativas[index];
 
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: ElevatedButton(
-                            onPressed: () => responder(alternativa),
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size.fromHeight(70),
+                        Color corBotao = Colors.white;
+
+                        if (alternativaCorreta != null) {
+                          if (index == alternativaCorreta) {
+                            corBotao = Colors.green;
+                          }
+
+                          if (index == alternativaSelecionada &&
+                              index != alternativaCorreta) {
+                            corBotao = Colors.red;
+                          }
+                        }
+
+                        return ElevatedButton(
+                          onPressed: () => responder(alternativa),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: corBotao,
+                            foregroundColor: corBotao == Colors.white
+                                ? Colors.black
+                                : Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Text(
-                              alternativa['texto']?.toString() ?? '',
-                              textAlign: TextAlign.center,
-                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (alternativa['texto'] != null &&
+                                  alternativa['texto'].toString().isNotEmpty)
+                                Text(
+                                  alternativa['texto'].toString(),
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+
+                              if (alternativa['caminho_imagem_alternativa'] !=
+                                      null &&
+                                  alternativa['caminho_imagem_alternativa']
+                                      .toString()
+                                      .isNotEmpty) ...[
+                                const SizedBox(height: 10),
+                                Image.file(
+                                  File(
+                                    alternativa['caminho_imagem_alternativa'],
+                                  ),
+                                  height: 180,
+                                  fit: BoxFit.contain,
+                                ),
+                              ],
+                            ],
                           ),
                         );
                       },
                     ),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(
+                      ElevatedButton.icon(
                         onPressed: usou5050 ? null : usar5050,
-                        child: const Text('50/50'),
+                        icon: const Icon(Icons.content_cut),
+                        label: const Text('50/50'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF1E2A44),
+                          elevation: 4,
+                          minimumSize: const Size(120, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                       ),
-                      ElevatedButton(
+                      const SizedBox(width: 20),
+                      ElevatedButton.icon(
                         onPressed: usouDica ? null : mostrarDica,
-                        child: const Text('Dica'),
+                        icon: const Icon(Icons.lightbulb_outline),
+                        label: const Text('Dica'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF1E2A44),
+                          elevation: 4,
+                          minimumSize: const Size(120, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                       ),
-                      ElevatedButton(
+                      const SizedBox(width: 20),
+                      ElevatedButton.icon(
                         onPressed: usouPular ? null : pularPergunta,
-                        child: const Text('Pular'),
+                        icon: const Icon(Icons.skip_next),
+                        label: const Text('Pular'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF1E2A44),
+                          elevation: 4,
+                          minimumSize: const Size(120, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ],
+              ),
+            ),
+          ),
+          Positioned(
+            right: 20,
+            bottom: 20,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.logout),
+              label: const Text('Sair'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey.shade700,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(120, 50),
+                elevation: 6,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ),

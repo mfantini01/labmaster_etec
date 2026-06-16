@@ -102,19 +102,22 @@ class TelaAluno extends StatelessWidget {
           Positioned(
             bottom: 30,
             right: 30,
-            child: SizedBox(
-              width: isMobile ? 90 : 100,
-              height: isMobile ? 45 : 50,
-              child: ElevatedButton(
-                onPressed: () => fazerLogout(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[700],
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+            child: ElevatedButton.icon(
+              onPressed: () => fazerLogout(context),
+              icon: const Icon(Icons.logout),
+              label: const Text(
+                'Sair',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey.shade700,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(120, 50),
+                elevation: 6,
+                shadowColor: Colors.black54,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text('Sair'),
               ),
             ),
           ),
